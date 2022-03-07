@@ -55,6 +55,11 @@ public class CameraController : MonoBehaviour
         yield break;
     }
 
+    public bool CameraIsOnGameObject(GameObject gameObject)
+    {
+        return (ToCameraPosition(gameObject.transform.position) - cameraGameObject.transform.position).magnitude < 0.01f;
+    }
+
     public static Vector3 ToCameraPosition(Vector3 position) {
         return new Vector3(position.x, position.y, Instance.defaultCameraZ);
     }

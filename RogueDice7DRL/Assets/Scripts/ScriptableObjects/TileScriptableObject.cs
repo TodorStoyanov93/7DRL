@@ -6,7 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Tile", menuName = "ScriptableObjects/Tile", order = 1)]
 public class TileScriptableObject : ScriptableObject
 {
-    public TileTypeEnum tileTypeEnum;
+    //public TileTypeEnum tileTypeEnum;
 
     public Color color;
 

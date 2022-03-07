@@ -33,29 +33,27 @@ public class InputController : MonoBehaviour
             if (didRaycastHit) {
                 Vector2Int hitGoPos = new Vector2Int(Mathf.RoundToInt(hit.collider.gameObject.transform.position.x),
                     Mathf.RoundToInt(hit.collider.gameObject.transform.position.y));
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButtonDown(0)) //not if over ui element
                 {
-                    GameplayController.Instance.PlayerInputMove(hitGoPos);
-
-
+                    playerControlledUnit.OnTileClick(hitGoPos);
                 }
-                else {
-                    OverlayController.Instance.HighlightForCursor(hitGoPos);
-                   
-                }
+
+                playerControlledUnit.OnTileHover(hitGoPos);
 
             }
 
             if (Input.GetMouseButtonDown(1)) {
-                AnimationManager.Instance.PlayAttackAnimation();
+
+                playerControlledUnit.OnRightClick();
             }
         }
     }
 
 
-
-    internal void WaitForInput()
+    private PlayerControlledUnit playerControlledUnit;
+    internal void WaitForInput(PlayerControlledUnit playerControlledUnit)
     {
+        this.playerControlledUnit = playerControlledUnit;
         isActive = true;
     }
 

@@ -16,10 +16,13 @@ public class BoardManager : MonoBehaviour
     private CameraController cameraController;
 
     public GameObject playerPrefab;
+    public List<GameObject> enemyPrefabs;
 
     public GameObject player;
 
     public LevelLayout layout;
+
+    public List<GameObject> enemies;
 
     public static BoardManager Instance { get; private set; }
     public void Awake()
@@ -42,36 +45,61 @@ public class BoardManager : MonoBehaviour
 
     public void StartGame() {
         var layout = GetEmptyLayout();
+        this.layout = layout;
         var startingRoom = GenerateRoom();
         layout.startingRoom = startingRoom;
+
         DrawRoom(layout.startingRoom);
+
+
         var startPos = GetPlayerStartingPosition(layout.startingRoom);
-        CreatePlayer(startPos);
+        Instance.player = CreatePlayerGameObject(startPos);
+        Unit playerUnit = new PlayerControlledUnit();
+        playerUnit.gameObject = player;
+        TurnSystem.Instance.units.Add(playerUnit);
 
+        for (var i = 0; i < 5; i++) { 
+            var randomWalkablePos = GetRandomWalkablePosition(layout.startingRoom);
+            var enemy = CreateEnemyGameObject(randomWalkablePos);
+            Instance.enemies.Add(enemy);
+            Unit enemyUnit = new AIControlledUnit();
+            enemyUnit.gameObject = enemy;
+            TurnSystem.Instance.units.Add(enemyUnit);
+        }
 
-
-        this.layout = layout;
-        Actor playerActor = new ActorPlayer();
-
-        //TurnSystem.Instance.actors.Add(playerActor);
-        //TurnSystem.Instance.BeginFirstTurn();
-        GameplayController.Instance.BeginPlayerTurn();
-
-        
+        CameraController.Instance.SnapTo(player);
+        TurnSystem.Instance.BeginFirstTurn();
     }
 
-    private static Tuple<int, int> GetPlayerStartingPosition(Room room) {
+    private static Vector2Int GetPlayerStartingPosition(Room room) {
         var width = room.GetWidth();
         var height = room.GetHeight();
         for (var j = 0; j < height; j++) {
             for (var i = 0; i < width; i++)
             {
                 if (room.GetTile(i, j).so.isWalkable) {
-                    return new Tuple<int, int>(i, j);
+                    return new Vector2Int(i, j);
                 }
             }
         }
-        return null;
+        return new Vector2Int();
+    }
+
+    private static Vector2Int GetRandomWalkablePosition(Room room)
+    {
+        var width = room.GetWidth();
+        var height = room.GetHeight();
+
+        var tries = 10;
+        while (tries > 0) { 
+            var tilePosToCheck = new Vector2Int(Random.Range(0, width - 1), Random.Range(0, height - 1));
+
+            if (room.GetTile(tilePosToCheck).so.isWalkable) {
+                return tilePosToCheck;
+            }
+            tries--;
+        }
+        return new Vector2Int();
     }
 
 
@@ -141,10 +169,17 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    private static void CreatePlayer(Tuple<int, int> startPos) {
-
+    private static GameObject CreatePlayerGameObject(Vector2Int startPos) {
         var player = Instantiate(Instance.playerPrefab, 
-            new Vector3(startPos.Item1, startPos.Item2, 0), Quaternion.identity, Instance.boardGameObject.transform);
-        Instance.player = player;
+            new Vector3(startPos.x, startPos.y, 0), Quaternion.identity, Instance.boardGameObject.transform);
+        return player;
+    }
+
+    private static GameObject CreateEnemyGameObject(Vector2Int startPos)
+    {
+        var enemyPrefab = Instance.enemyPrefabs[Random.Range(0, Instance.enemyPrefabs.Count)];
+        var enemy = Instantiate(enemyPrefab,
+            new Vector3(startPos.x, startPos.y, 0), Quaternion.identity, Instance.boardGameObject.transform);
+        return enemy;
     }
 }

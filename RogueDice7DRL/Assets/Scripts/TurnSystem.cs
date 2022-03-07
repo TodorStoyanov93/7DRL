@@ -5,15 +5,15 @@ using UnityEngine;
 
 public class TurnSystem : MonoBehaviour
 {
-    public List<Actor> actors;
-    public Actor currentActor;
+    public List<Unit> units;
+    public Unit currentUnit;
     private int currentActorIndex;
     public static TurnSystem Instance { get; private set; }
 
     void Awake()
     {
         Instance = this;
-        actors = new List<Actor>();
+        units = new List<Unit>();
     }
 
     // Start is called before the first frame update
@@ -32,30 +32,43 @@ public class TurnSystem : MonoBehaviour
     {
         EnsureAtleast1Actor();
         SetCurrentActorFirst();
-        BeginTurn();
-
+        StartCoroutine(BeginTurn());
     }
 
     private void SetCurrentActorFirst()
     {
         currentActorIndex = 0;
-        currentActor = actors[currentActorIndex];
+        currentUnit = units[currentActorIndex];
     }
 
     private void SetCurrentActorNext() {
         currentActorIndex++;
-        currentActorIndex %= actors.Count;
+        currentActorIndex %= units.Count;
+        currentUnit = units[currentActorIndex];
+
+        Debug.Log(currentActorIndex);
     }
 
 
     private void EnsureAtleast1Actor()
     {
-        if (actors.Count == 0) {
+        if (units.Count == 0) {
             Debug.Log("No actors in scene");
+            throw new Exception("No actors in scene");
         } 
     }
 
-    void BeginTurn() {
-        //CameraController.Instance.SnapTo(currentActor.unit.gameObject);
+    IEnumerator BeginTurn() {
+        if (!CameraController.Instance.CameraIsOnGameObject(currentUnit.gameObject)) {
+            StartCoroutine(CameraController.Instance.FollowSmooth(currentUnit.gameObject, 0.5f));
+            yield return new WaitForSeconds(0.5f);
+        }
+        currentUnit.Turn();
+    }
+
+    public void EndTurn()
+    {
+        SetCurrentActorNext();
+        StartCoroutine(BeginTurn());
     }
 }

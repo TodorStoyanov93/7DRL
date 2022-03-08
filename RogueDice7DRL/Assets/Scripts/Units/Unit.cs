@@ -6,5 +6,7 @@ public abstract class Unit
 {
     public GameObject gameObject;
 
+    public List<Dice> dices;
+
     public abstract void Turn();
 }

@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AnimationManager : MonoBehaviour
-{
-    public Animator playerAnimator;
+{ 
     public static AnimationManager Instance { get; private set; }
 
     private void Awake()
     {
         Instance = this;
-        
     }
     // Start is called before the first frame update
     void Start()
@@ -25,26 +23,20 @@ public class AnimationManager : MonoBehaviour
         
     }
 
-    private void Init() {
-        if (playerAnimator == null) { 
-            playerAnimator = BoardManager.Instance.player.GetComponent<Animator>();
-        }
+    public void PlayMoveAnimation(Unit unit) {
+        var animator = unit.gameObject.GetComponent<Animator>();
+        animator.SetBool("move",true);
     }
 
-    public void PlayMoveAnimation() {
-        Init();
-        playerAnimator.SetBool("move",true);
-    }
-
-    public void StopMoveAnimation()
+    public void StopMoveAnimation(Unit unit)
     {
-        Init();
-        playerAnimator.SetBool("move", false);
+        var animator = unit.gameObject.GetComponent<Animator>();
+        animator.SetBool("move", false);
     }
 
-    public void PlayAttackAnimation() {
-        Init();
-        playerAnimator.SetTrigger("attack");
+    public void PlayAttackAnimation(Unit unit) {
+        var animator = unit.gameObject.GetComponent<Animator>();
+        animator.SetTrigger("attack");
     }
 
 

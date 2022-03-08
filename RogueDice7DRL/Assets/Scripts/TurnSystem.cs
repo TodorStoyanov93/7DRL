@@ -45,8 +45,6 @@ public class TurnSystem : MonoBehaviour
         currentActorIndex++;
         currentActorIndex %= units.Count;
         currentUnit = units[currentActorIndex];
-
-        Debug.Log(currentActorIndex);
     }
 
 

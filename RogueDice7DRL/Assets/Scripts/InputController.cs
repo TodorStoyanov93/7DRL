@@ -22,7 +22,7 @@ public class InputController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isActive) {
+        if (isActive && playerControlledUnit != null) {
             RaycastHit hit;
             LayerMask mask = LayerMask.GetMask("Ground");
 
@@ -35,16 +35,20 @@ public class InputController : MonoBehaviour
                     Mathf.RoundToInt(hit.collider.gameObject.transform.position.y));
                 if (Input.GetMouseButtonDown(0)) //not if over ui element
                 {
-                    playerControlledUnit.OnTileClick(hitGoPos);
+                    if (isActive) { 
+                        playerControlledUnit.OnTileClick(hitGoPos);
+                    }
                 }
-
-                playerControlledUnit.OnTileHover(hitGoPos);
+                if (isActive) { 
+                    playerControlledUnit.OnTileHover(hitGoPos);
+                }
 
             }
 
             if (Input.GetMouseButtonDown(1)) {
-
-                playerControlledUnit.OnRightClick();
+                if (isActive) { 
+                    playerControlledUnit.OnRightClick();
+                }
             }
         }
     }

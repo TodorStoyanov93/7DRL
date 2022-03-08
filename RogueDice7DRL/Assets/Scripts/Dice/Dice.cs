@@ -5,7 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Dice", menuName = "ScriptableObjects/Dice", order = 2)]
 public class Dice : ScriptableObject
 {
-    public string Name;
+    public string name;
+
     public Side sideTop;
     public Side sideBottom;
     public Side sideLeft;

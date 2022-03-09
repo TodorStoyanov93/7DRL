@@ -58,8 +58,7 @@ public class TurnSystem : MonoBehaviour
 
     IEnumerator BeginTurn() {
         if (!CameraController.Instance.CameraIsOnGameObject(currentUnit.gameObject)) {
-            StartCoroutine(CameraController.Instance.FollowSmooth(currentUnit.gameObject, 0.5f));
-            yield return new WaitForSeconds(0.5f);
+            yield return StartCoroutine(CameraController.Instance.FollowSmooth(currentUnit.gameObject, 0.5f));
         }
         currentUnit.Turn();
     }

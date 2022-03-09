@@ -16,4 +16,4 @@ MonoBehaviour:
   power: 1
   backgroundImage: {fileID: 0}
   foregroundImage: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  range: 1
+  range: 2

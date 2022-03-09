@@ -6,8 +6,6 @@ public class AIControlledUnit : Unit
 {
     public override void Turn()
     {
-        
-
         var randomDirection = new List<Vector2Int>()
         {
             new Vector2Int(0,-Random.Range(1,2)),
@@ -26,7 +24,7 @@ public class AIControlledUnit : Unit
         var unitPos = Helpers.RoundToVector2Int(unit.gameObject.transform.position);
         var diff = position - Helpers.RoundToVector2Int(unitPos);
         bool isIn2Range = diff.magnitude <= 1.0f;
-        bool isWalkable = BoardManager.Instance.layout.startingRoom.GetTile(position.x, position.y).so.isWalkable;
+        bool isWalkable = BoardManager.Instance.layout.startingRoom.GetTile(position).so.isWalkable;
 
         if (isIn2Range && isWalkable)
         {

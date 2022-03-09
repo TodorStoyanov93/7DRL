@@ -4,25 +4,17 @@ using UnityEngine;
 
 public class Room
 {
-    public List<Room> teleportRooms;
-
     private TileDescriptor[,] _tiles;
 
     public void SetTiles(TileDescriptor[,] tiles) {
         this._tiles = tiles;
     }
 
-    public TileDescriptor[,] GetTiles() {
-        return _tiles;
-    }
-
     public TileDescriptor GetTile(Vector2Int vector2Int) {
-        return _tiles[vector2Int.y, vector2Int.x];
-    }
-
-    public TileDescriptor GetTile(int x, int y)
-    {
-        return _tiles[y, x];
+        if (vector2Int.y >= 0 && vector2Int.y < GetHeight() && vector2Int.x >= 0 && vector2Int.x < GetWidth()) {
+            return _tiles[vector2Int.y, vector2Int.x];
+        }
+        return null;
     }
 
     public int GetWidth() {

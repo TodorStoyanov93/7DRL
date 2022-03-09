@@ -42,6 +42,4 @@ public class ActivatableDice
 
         return result;
     }
-
-
 }

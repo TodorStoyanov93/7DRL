@@ -83,7 +83,7 @@ public class OverlayController : MonoBehaviour
     }
 
     public void OverlayWalkableTilesForPlayer() {
-        var player = BoardManager.Instance.player;
+        var player = BoardManager.Instance.playerUnit.gameObject;
         var room = BoardManager.Instance.layout.startingRoom;
         var playerPosition = player.transform.position;
         Vector2Int playerPosInt = new Vector2Int(Mathf.RoundToInt(playerPosition.x), Mathf.RoundToInt(playerPosition.y));
@@ -95,10 +95,14 @@ public class OverlayController : MonoBehaviour
             new Vector2Int(playerPosInt.x-1,playerPosInt.y)
         };
 
-        foreach (var place in placesToCheck) {
-            if (place.y >= 0 && place.y < room.GetHeight() && place.x >= 0 && place.x < room.GetWidth())
+
+        foreach (var place in placesToCheck)
+        {
+            var tile = room.GetTile(place);
+            if (tile != null)
             {
-                if (room.GetTile(place.x,place.y).so.isWalkable) {
+                if (room.GetTile(place).so.isWalkable)
+                {
                     var overlay = CreateOverlayTile(place, Color.white);
                     overlays.Add(overlay);
                 }

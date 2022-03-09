@@ -12,29 +12,29 @@ public class BoardManager : MonoBehaviour
     public TileScriptableObject invalidTile;
 
     private GameObject boardGameObject;
-    int depth;
-    private CameraController cameraController;
 
     public GameObject playerPrefab;
     public List<GameObject> enemyPrefabs;
 
-    public GameObject player;
-
     public LevelLayout layout;
 
-    public List<GameObject> enemies;
+    public Unit playerUnit;
+
+    public List<Unit> enemyUnits;
 
     public static BoardManager Instance { get; private set; }
     public void Awake()
     {
         Instance = this;
-        cameraController = GetComponent<CameraController>();
-    }
-    void Start()
-    {
         this.boardGameObject = GameObject.Find("Board");
         int seed = 5;
         Random.InitState(seed);
+        enemyUnits = new List<Unit>();
+
+    }
+    void Start()
+    {
+
     }
 
     // Update is called once per frame
@@ -53,33 +53,29 @@ public class BoardManager : MonoBehaviour
 
 
         var startPos = GetPlayerStartingPosition(layout.startingRoom);
-        Instance.player = CreatePlayerGameObject(startPos);
-        Unit playerUnit = new PlayerControlledUnit();
+        var player = CreatePlayerGameObject(startPos);
+        playerUnit = new PlayerControlledUnit();
         playerUnit.gameObject = player;
         TurnSystem.Instance.units.Add(playerUnit);
 
-        DiceData randomDice = DiceManager.Instance.GetRandomDiceFromList();
-        ActivatableDice activatableDice = ActivatableDice.CreateActivatableDice(true,randomDice);
-        playerUnit.dices.Add(activatableDice);
-        playerUnit.dices.Add(activatableDice);
-        playerUnit.dices.Add(activatableDice);
-        playerUnit.dices.Add(activatableDice);
-        playerUnit.dices.Add(activatableDice);
-        playerUnit.dices.Add(activatableDice);
-        playerUnit.dices.Add(activatableDice);
-
+        for (var i = 0; i < 7; i++) { 
+            DiceData randomDice = DiceManager.Instance.GetRandomDiceFromList();
+        
+            ActivatableDice activatableDice = ActivatableDice.CreateActivatableDice(true,randomDice);
+            playerUnit.dices.Add(activatableDice);
+        }
 
         for (var i = 0; i < 5; i++) { 
             var randomWalkablePos = GetRandomWalkablePosition(layout.startingRoom);
             var enemy = CreateEnemyGameObject(randomWalkablePos);
-            Instance.enemies.Add(enemy);
             Unit enemyUnit = new AIControlledUnit();
             enemyUnit.gameObject = enemy;
             TurnSystem.Instance.units.Add(enemyUnit);
+            enemyUnits.Add(enemyUnit);
         }
 
         CameraController.Instance.SnapTo(player);
-        PlayerUIManager.Instance.DrawInitialCards(playerUnit.dices);
+        PlayerUIManager.Instance.ResetCardView();
         TurnSystem.Instance.BeginFirstTurn();
     }
 
@@ -89,7 +85,8 @@ public class BoardManager : MonoBehaviour
         for (var j = 0; j < height; j++) {
             for (var i = 0; i < width; i++)
             {
-                if (room.GetTile(i, j).so.isWalkable) {
+                var vector2Pos = new Vector2Int(i,j);
+                if (room.GetTile(vector2Pos).so.isWalkable) {
                     return new Vector2Int(i, j);
                 }
             }
@@ -120,15 +117,15 @@ public class BoardManager : MonoBehaviour
         return layout;
     }
 
-    private static Room GenerateRoom() {
+    private Room GenerateRoom() {
 
-        var imageIndex = Random.Range(0, Instance.levelTextures.Count);
-        var image = Instance.levelTextures[imageIndex];
+        var imageIndex = Random.Range(0, levelTextures.Count);
+        var image = levelTextures[imageIndex];
         Room room = GenerateRoomFromTexture2D(image);
         return room;
     }
 
-    private static Room GenerateRoomFromTexture2D(Texture2D source)
+    private Room GenerateRoomFromTexture2D(Texture2D source)
     {
         Room room = new Room();
         int imageWidth = source.width;
@@ -144,14 +141,14 @@ public class BoardManager : MonoBehaviour
             for (int i = 0; i < imageWidth; i++)
             {
                 var index = j * imageWidth + i;
-                var found = Instance.levelMapping.Find(i=> i.color == pixels[index]);
+                var found = levelMapping.Find(i=> i.color == pixels[index]);
                 TileDescriptor tile = new TileDescriptor();
                 if (found != null)
                 {
                     tile.so = found;
                 }
                 else {
-                    tile.so = Instance.invalidTile;
+                    tile.so = invalidTile;
                 }
                 tiles[j,i] = tile;
             }
@@ -169,7 +166,8 @@ public class BoardManager : MonoBehaviour
         {
             for (var i = 0; i < width; i++)
             {
-                var tile = room.GetTile(i,j);
+                var position = new Vector2Int(i, j);
+                var tile = room.GetTile(position);
                 if (tile.so != null)
                 {
                     var randomIndex = Random.Range(0, tile.so.prefabs.Count - 1);
@@ -181,17 +179,17 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    private static GameObject CreatePlayerGameObject(Vector2Int startPos) {
-        var player = Instantiate(Instance.playerPrefab, 
-            new Vector3(startPos.x, startPos.y, 0), Quaternion.identity, Instance.boardGameObject.transform);
+    private GameObject CreatePlayerGameObject(Vector2Int startPos) {
+        var player = Instantiate(playerPrefab, 
+            new Vector3(startPos.x, startPos.y, 0), Quaternion.identity, boardGameObject.transform);
         return player;
     }
 
-    private static GameObject CreateEnemyGameObject(Vector2Int startPos)
+    private GameObject CreateEnemyGameObject(Vector2Int startPos)
     {
-        var enemyPrefab = Instance.enemyPrefabs[Random.Range(0, Instance.enemyPrefabs.Count)];
+        var enemyPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Count)];
         var enemy = Instantiate(enemyPrefab,
-            new Vector3(startPos.x, startPos.y, 0), Quaternion.identity, Instance.boardGameObject.transform);
+            new Vector3(startPos.x, startPos.y, 0), Quaternion.identity, boardGameObject.transform);
         return enemy;
     }
 }

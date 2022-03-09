@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class UiDice
 {
-    public ActivatableDice diceRef;
+    public ActivatableDice activatableDice;
     public GameObject diceGameObject;
+    public UiDiceState state;
 
 }

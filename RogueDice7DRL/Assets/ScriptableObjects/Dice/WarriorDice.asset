@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5207648c3930f74ab23de7fbce886a3, type: 3}
+  m_Name: WarriorDice
+  m_EditorClassIdentifier: 
+  diceName: Warrior Dice
+  sideTop: {fileID: 11400000, guid: 74d84d64ae799b5439b7a7de38678cbb, type: 2}
+  sideBottom: {fileID: 11400000, guid: 74d84d64ae799b5439b7a7de38678cbb, type: 2}
+  sideLeft: {fileID: 11400000, guid: 74d84d64ae799b5439b7a7de38678cbb, type: 2}
+  sideRight: {fileID: 11400000, guid: 74d84d64ae799b5439b7a7de38678cbb, type: 2}
+  sideFront: {fileID: 11400000, guid: 74d84d64ae799b5439b7a7de38678cbb, type: 2}
+  sideBack: {fileID: 11400000, guid: 74d84d64ae799b5439b7a7de38678cbb, type: 2}

@@ -58,6 +58,17 @@ public class BoardManager : MonoBehaviour
         playerUnit.gameObject = player;
         TurnSystem.Instance.units.Add(playerUnit);
 
+        DiceData randomDice = DiceManager.Instance.GetRandomDiceFromList();
+        ActivatableDice activatableDice = ActivatableDice.CreateActivatableDice(true,randomDice);
+        playerUnit.dices.Add(activatableDice);
+        playerUnit.dices.Add(activatableDice);
+        playerUnit.dices.Add(activatableDice);
+        playerUnit.dices.Add(activatableDice);
+        playerUnit.dices.Add(activatableDice);
+        playerUnit.dices.Add(activatableDice);
+        playerUnit.dices.Add(activatableDice);
+
+
         for (var i = 0; i < 5; i++) { 
             var randomWalkablePos = GetRandomWalkablePosition(layout.startingRoom);
             var enemy = CreateEnemyGameObject(randomWalkablePos);
@@ -68,6 +79,7 @@ public class BoardManager : MonoBehaviour
         }
 
         CameraController.Instance.SnapTo(player);
+        PlayerUIManager.Instance.DrawInitialCards(playerUnit.dices);
         TurnSystem.Instance.BeginFirstTurn();
     }
 

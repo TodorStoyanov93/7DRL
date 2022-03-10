@@ -60,9 +60,13 @@ public class PlayerUIManager : MonoBehaviour
         playerUi.SetActive(true);
     }
 
-    internal void ResetCardView()
+    public void DisablePlayerUi()
     {
-        List<ActivatableDice> dices = BoardManager.Instance.playerUnit.dices;
+        playerUi.SetActive(false);
+    }
+
+    public void ClearCardView() {
+        
         for (int i = 0; i < uiDices.Count; i++)
         {
             var curr = uiDices[i];
@@ -76,15 +80,19 @@ public class PlayerUIManager : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+    }
 
-
-        for (int i = 0; i < dices.Count; i++) {
+    public void DrawCardView() {
+        List<ActivatableDice> dices = BoardManager.Instance.playerUnit.dices;
+        for (int i = 0; i < dices.Count; i++)
+        {
             var curr = dices[i];
 
             var createdInstance = Instantiate(dicePrefab, Vector3.zero, Quaternion.identity, diceContainer.transform);
             GameObject imageContainer = createdInstance.transform.Find("ImagesContainer").gameObject;
-            
-            if (curr.chosenSide.foregroundImage == null) {
+
+            if (curr.chosenSide.foregroundImage == null)
+            {
                 Debug.Log("Foreground image missing for dice" + curr.diceDataRef.diceName);
             }
 
@@ -103,13 +111,17 @@ public class PlayerUIManager : MonoBehaviour
 
             var activeImageGo = imageContainer.transform.Find("ActiveImage");
             var activeImageImage = activeImageGo.GetComponent<Image>();
-            if (curr.isActive) { 
+            if (curr.isActive)
+            {
                 activeImageImage.color = Color.green;
-            } else {
+            }
+            else
+            {
                 activeImageImage.color = new Color(0, 0, 0, 0);
             }
 
-            UiDice uiDice = new UiDice() {
+            UiDice uiDice = new UiDice()
+            {
                 diceGameObject = createdInstance,
                 activatableDice = curr,
                 state = UiDiceState.Normal
@@ -121,7 +133,6 @@ public class PlayerUIManager : MonoBehaviour
 
         ResetSortingOrderForAllDice();
     }
-
 
 
     private void SetDiceByState(UiDice uiDice) {
@@ -166,13 +177,16 @@ public class PlayerUIManager : MonoBehaviour
                                 SetAllDiceUnclicked();
                                 uiDice.state = UiDiceState.Clicked;
                                 SetDiceByState(uiDice);
-                                (BoardManager.Instance.playerUnit as PlayerControlledUnit).DiceClicked(uiDice.activatableDice);
+                                InputHandler.Instance.DiceClicked(uiDice.activatableDice);
                             }
                             else
                             {
-                                //Write msg
-                                uiDice.state = UiDiceState.Clicked;
-                                SetDiceByState(uiDice);
+
+                                //uiDice.state = UiDiceState.Normal;
+                                //SetDiceByState(uiDice);
+
+                                //Write msg but dont reset ?
+
                             }
                         }
                     };
@@ -220,6 +234,24 @@ public class PlayerUIManager : MonoBehaviour
         currentClickedDice.state = UiDiceState.Normal;
         SetDiceByState(currentClickedDice);
         ResetSortingOrderForAllDice();
+        currentClickedDice = null;
+    }
+
+    public void RefreshCurrentDiceActive() {
+        var isActive = currentClickedDice.activatableDice.isActive;
+        GameObject imageContainer = currentClickedDice.diceGameObject.transform.Find("ImagesContainer").gameObject;
+
+        var backgroundImageGo = imageContainer.transform.Find("BackgroundImage");
+        var activeImageGo = imageContainer.transform.Find("ActiveImage");
+        var activeImageImage = activeImageGo.GetComponent<Image>();
+        if (isActive)
+        {
+            activeImageImage.color = Color.green;
+        }
+        else
+        {
+            activeImageImage.color = new Color(0, 0, 0, 0);
+        }
     }
 
     private void ResetSortingOrderForAllDice() {

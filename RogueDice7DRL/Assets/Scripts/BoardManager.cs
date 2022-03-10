@@ -75,7 +75,15 @@ public class BoardManager : MonoBehaviour
         }
 
         CameraController.Instance.SnapTo(player);
-        PlayerUIManager.Instance.ResetCardView();
+
+        PlayerUIManager.Instance.ClearCardView();
+        PlayerUIManager.Instance.DrawCardView();
+
+
+        PlayerUIManager.Instance.EnablePlayerUi();
+
+        InputController.Instance.WaitForInput();
+
         TurnSystem.Instance.BeginFirstTurn();
     }
 

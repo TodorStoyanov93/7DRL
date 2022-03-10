@@ -38,6 +38,26 @@ public class AnimationManager : MonoBehaviour
         var animator = unit.gameObject.GetComponent<Animator>();
         animator.SetTrigger("attack");
     }
+    public void TurnSprite(Unit unit, Vector2Int direction) {
+        if ((Helpers.RoundToVector2Int(gameObject.transform.position) - direction).x < 0)
+        {
+            var spriteRenderer = unit.gameObject.GetComponent<SpriteRenderer>();
+            var isFlippedToLookLeft = spriteRenderer.flipX;
+            if (isFlippedToLookLeft)
+            {
+                spriteRenderer.flipX = false;
+            }
+        }
+        else if ((Helpers.RoundToVector2Int(unit.gameObject.transform.position) - direction).x > 0)
+        {
+            var spriteRenderer = unit.gameObject.GetComponent<SpriteRenderer>();
+            var isFlippedToLookRight = !spriteRenderer.flipX;
+            if (isFlippedToLookRight)
+            {
+                spriteRenderer.flipX = true;
+            }
+        }
+    }
 
 
 }

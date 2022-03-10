@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum PlayerInputState { 
     Undefined = 0,
-    Move = 1,
+    Default = 1,
     ChoseTarget = 2,
+    ChoseCard = 3,
 }

@@ -23,6 +23,7 @@ public class RogueGameManager : MonoBehaviour
 
     void Start()
     {
+        PlayerUIManager.Instance.DisablePlayerUi();
         GameObject startGameButton = GameObject.Find("StartGameButton");
         if (startGameButton == null)
         {

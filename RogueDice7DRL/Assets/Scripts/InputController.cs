@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class InputController : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class InputController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isActive && playerControlledUnit != null) {
+        if (isActive && !EventSystem.current.IsPointerOverGameObject()) {
             RaycastHit hit;
             LayerMask mask = LayerMask.GetMask("Ground");
 
@@ -36,32 +37,35 @@ public class InputController : MonoBehaviour
                 if (Input.GetMouseButtonDown(0)) //not if over ui element
                 {
                     if (isActive) { 
-                        playerControlledUnit.OnTileClick(hitGoPos);
+                        InputHandler.Instance.OnTileClick(hitGoPos);
                     }
                 }
-                if (isActive) { 
-                    playerControlledUnit.OnTileHover(hitGoPos);
+                if (isActive) {
+                    InputHandler.Instance.OnTileHover(hitGoPos);
                 }
 
+
+            } else {
+                if (isActive)
+                {
+                    InputHandler.Instance.OnNoTileHovered();
+                }
             }
 
             if (Input.GetMouseButtonDown(1)) {
-                if (isActive) { 
-                    playerControlledUnit.OnRightClick();
+                if (isActive) {
+                    InputHandler.Instance.OnRightClick();
                 }
             }
         }
     }
 
-
-    private PlayerControlledUnit playerControlledUnit;
-    internal void WaitForInput(PlayerControlledUnit playerControlledUnit)
+    internal void WaitForInput()
     {
-        this.playerControlledUnit = playerControlledUnit;
         isActive = true;
     }
 
-    internal void StopWaitingForInput() {
-        isActive = false;
-    }
+    //internal void StopWaitingForInput() {
+    //    isActive = false;
+    //}
 }

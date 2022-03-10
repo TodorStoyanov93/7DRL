@@ -10,15 +10,17 @@ public class OverlayController : MonoBehaviour
 
     public GameObject overlayPrefab;
     private GameObject overlayContainer;
+    private GameObject highlightForCursor;
+    private List<GameObject> overlays;
+    private List<GameObject> targetOverlays;
 
-    List<GameObject> overlays;
 
     private void Awake()
     {
         Instance = this;
         
         overlays = new List<GameObject>();
-
+        targetOverlays = new List<GameObject>();
         overlayContainer = new GameObject("OverlayContainer");
 
     }
@@ -34,7 +36,7 @@ public class OverlayController : MonoBehaviour
         
     }
 
-    private GameObject highlightForCursor;
+
     public void HighlightForCursor(Vector2Int position)
     {
         overlays.ForEach(i=>i.SetActive(true));
@@ -42,6 +44,14 @@ public class OverlayController : MonoBehaviour
         var contains = overlays.Select(i => Helpers.RoundToVector2Int(i.transform.position)).Contains(position);
         if (contains) {
             var first = overlays.Find(i => Helpers.RoundToVector2Int(i.transform.position) == position);
+            first.SetActive(false);
+            color = Color.green;
+        }
+        targetOverlays.ForEach(i => i.SetActive(true));
+        var contains2 = targetOverlays.Select(i => Helpers.RoundToVector2Int(i.transform.position)).Contains(position);
+        if (contains2)
+        {
+            var first = targetOverlays.Find(i => Helpers.RoundToVector2Int(i.transform.position) == position);
             first.SetActive(false);
             color = Color.green;
         }
@@ -78,8 +88,20 @@ public class OverlayController : MonoBehaviour
                 Destroy(highlightForWalkable);
             }
         }
-        overlays = new List<GameObject>();
+        overlays.Clear();
 
+    }
+
+    public void ClearTargetTiles()
+    {
+        foreach (var highlightForWalkable in targetOverlays)
+        {
+            if (highlightForWalkable != null)
+            {
+                Destroy(highlightForWalkable);
+            }
+        }
+        targetOverlays.Clear();
     }
 
     public void OverlayWalkableTilesForPlayer() {
@@ -107,6 +129,18 @@ public class OverlayController : MonoBehaviour
                     overlays.Add(overlay);
                 }
             }
+        }
+
+    }
+
+
+    public void OverlayTargetTiles(List<Vector2Int> positions)
+    {
+
+        foreach (var pos in positions)
+        {
+            var overlay = CreateOverlayTile(pos, Color.red);
+            targetOverlays.Add(overlay);
         }
 
     }

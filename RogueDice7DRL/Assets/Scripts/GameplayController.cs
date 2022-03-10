@@ -33,4 +33,16 @@ public class GameplayController : MonoBehaviour
         yield break;
     }
 
+
+    public void StartAndContinueCoroutine(IEnumerator coroutine, Action continueAction)
+    {
+        StartCoroutine(StartAndContinueCoroutinePriv(coroutine, continueAction));
+    }
+
+    private IEnumerator StartAndContinueCoroutinePriv(IEnumerator coroutine, Action continueAction ) {
+        yield return StartCoroutine(coroutine);
+        continueAction.Invoke();
+        yield break;
+    }
+
 }

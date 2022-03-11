@@ -13,7 +13,7 @@ public class TurnSystem : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        units = new List<Unit>();
+        ResetTurnSystem();
     }
 
     // Start is called before the first frame update
@@ -26,6 +26,13 @@ public class TurnSystem : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void ResetTurnSystem()
+    {
+        units = new List<Unit>();
+        currentUnit = null;
+        currentActorIndex = 0;
     }
 
     internal void BeginFirstTurn()
@@ -65,7 +72,27 @@ public class TurnSystem : MonoBehaviour
 
     public void EndTurn()
     {
-        SetCurrentActorNext();
-        StartCoroutine(BeginTurn());
+        if (units.Count > 0) { 
+            SetCurrentActorNext();
+            StartCoroutine(BeginTurn());
+        }
+    }
+
+    internal void RemoveUnit(Unit unit)
+    {
+        for (var i = 0; i < units.Count; i++) {
+            var curr = units[i];
+            if (curr == unit) {
+
+
+                units.RemoveAt(i);
+
+                if (currentActorIndex > i)
+                {
+                    currentActorIndex--;
+                }
+                break;
+            }
+        }
     }
 }

@@ -71,6 +71,7 @@ public class InputHandler : MonoBehaviour
                 selectedDice.isActive = false;
                 PlayerUIManager.Instance.RefreshCurrentDiceActive();
                 PlayerUIManager.Instance.CancelCurrentDice();
+                PlayerUIManager.Instance.HideDiceTooltip();
                 selectedDice = null;
 
                 OverlayController.Instance.ClearTargetTiles();
@@ -113,6 +114,7 @@ public class InputHandler : MonoBehaviour
         {
             
             PlayerUIManager.Instance.CancelCurrentDice();
+            PlayerUIManager.Instance.HideDiceTooltip();
             OverlayController.Instance.ClearTargetTiles();
 
             playerInputState = PlayerInputState.Default;
@@ -132,11 +134,13 @@ public class InputHandler : MonoBehaviour
                 playerInputState = PlayerInputState.ChoseTarget;
                 OverlayController.Instance.OverlayTargetTiles(validTargets);
                 selectedDice = activatableDice;
+                PlayerUIManager.Instance.ShowDiceTooltip(activatableDice);
             }
             else
             {
                 Debug.Log("Dice must be rolled before being used");
                 PlayerUIManager.Instance.CancelCurrentDice();
+
             }
         }
         else if (playerInputState == PlayerInputState.ChoseTarget)
@@ -149,6 +153,8 @@ public class InputHandler : MonoBehaviour
 
                 OverlayController.Instance.OverlayTargetTiles(validTargets);
                 selectedDice = activatableDice;
+
+                PlayerUIManager.Instance.ShowDiceTooltip(activatableDice);
             }
             else
             {
@@ -176,11 +182,24 @@ public class InputHandler : MonoBehaviour
     }
 
     public void TurnBeginsForPlayer() {
-        playerInputState = PlayerInputState.Default;
-        OverlayController.Instance.OverlayWalkableTilesForPlayer();
-        
+        if (playerInputState == PlayerInputState.Undefined) { 
+            if (selectedDice == null)
+            {
+                playerInputState = PlayerInputState.Default;
+                OverlayController.Instance.OverlayWalkableTilesForPlayer();
+
+            }
+            else {
+                playerInputState = PlayerInputState.ChoseTarget;
+                var playerPos = BoardManager.Instance.playerUnit.GetVector2IntPosition();
+                var validTargets = selectedDice.chosenSide.GetValidTargets(playerPos);
+                OverlayController.Instance.OverlayTargetTiles(validTargets);
+            }
+        }
     }
 
-    
+    public void Reset() {
+        playerInputState = PlayerInputState.Undefined;
+    }
 
 }

@@ -6,7 +6,7 @@ public abstract class SideData : ScriptableObject
 {
     public string description;
     public int power;
-    public Sprite backgroundImage;
+    public Color backgroundColor;
     public Sprite foregroundImage;
 
     public abstract bool IsTargetable();

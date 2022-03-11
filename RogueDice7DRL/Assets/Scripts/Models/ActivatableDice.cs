@@ -7,6 +7,7 @@ public class ActivatableDice
     public bool isActive;
     public DiceData diceDataRef;
     public SideData chosenSide;
+    public SideOfDice chosenSideOfDice;
 
     private ActivatableDice() { 
         
@@ -19,12 +20,12 @@ public class ActivatableDice
 
         result.diceDataRef = diceData;
         result.isActive = isActive;
-        result.chosenSide =  result.ChooseRandomSide();
+        result.ChooseRandomSide();
 
         return result;
     }
 
-    private SideData ChooseRandomSide() {
+    private void ChooseRandomSide() {
 
         int i = Random.Range(0,5);
 
@@ -32,14 +33,38 @@ public class ActivatableDice
         SideData[] sideDatas = new[] {
             diceDataRef.sideTop,
             diceDataRef.sideBottom,
-            diceDataRef.sideFront,
-            diceDataRef.sideBack,
             diceDataRef.sideLeft,
+            diceDataRef.sideRight,
+            diceDataRef.sideFront,
             diceDataRef.sideBack
         };
 
         var result = sideDatas[i];
 
-        return result;
+        this.chosenSide = result;
+
+        switch (i) {
+            case 0:
+                this.chosenSideOfDice = SideOfDice.Top;
+                break;
+            case 1:
+                this.chosenSideOfDice = SideOfDice.Bottom;
+                break;
+            case 2:
+                this.chosenSideOfDice = SideOfDice.Left;
+                break;
+            case 3:
+                this.chosenSideOfDice = SideOfDice.Right;
+                break;
+            case 4:
+                this.chosenSideOfDice = SideOfDice.Front;
+                break;
+            case 5:
+                this.chosenSideOfDice = SideOfDice.Back;
+                break;
+
+        }
+
+        
     }
 }

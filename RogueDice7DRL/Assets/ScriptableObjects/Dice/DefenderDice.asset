@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5207648c3930f74ab23de7fbce886a3, type: 3}
+  m_Name: DefenderDice
+  m_EditorClassIdentifier: 
+  diceName: Defender Dice
+  sideTop: {fileID: 11400000, guid: 21766e325c57ce948961780351223ecf, type: 2}
+  sideBottom: {fileID: 11400000, guid: eb11c5533c8b6df4d9e0cf0ac7a072c6, type: 2}
+  sideLeft: {fileID: 11400000, guid: 632613a85afd98641b162b3a1e93da0d, type: 2}
+  sideRight: {fileID: 11400000, guid: 9e90f23923e20594cac97309f91d2b74, type: 2}
+  sideFront: {fileID: 11400000, guid: 64fe195c5c0c0a440b3b87119fe1a838, type: 2}
+  sideBack: {fileID: 11400000, guid: 0b77983e652546842902cc947eb568a8, type: 2}

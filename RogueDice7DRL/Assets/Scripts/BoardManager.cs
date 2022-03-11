@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -16,11 +17,13 @@ public class BoardManager : MonoBehaviour
     public GameObject playerPrefab;
     public List<GameObject> enemyPrefabs;
 
-    public LevelLayout layout;
-
     public Unit playerUnit;
 
     public List<Unit> enemyUnits;
+
+    public int levelReached = 1;
+
+    public Room room;
 
     public static BoardManager Instance { get; private set; }
     public void Awake()
@@ -28,8 +31,8 @@ public class BoardManager : MonoBehaviour
         Instance = this;
         this.boardGameObject = GameObject.Find("Board");
         int seed = 5;
-        Random.InitState(seed);
-        enemyUnits = new List<Unit>();
+        //Random.InitState(seed);
+        
 
     }
     void Start()
@@ -44,15 +47,15 @@ public class BoardManager : MonoBehaviour
     }
 
     public void StartGame() {
-        var layout = GetEmptyLayout();
-        this.layout = layout;
-        var startingRoom = GenerateRoom();
-        layout.startingRoom = startingRoom;
+        enemyUnits = new List<Unit>();
+        var room = GenerateRoom();
+        this.room = room;
 
-        DrawRoom(layout.startingRoom);
+        DrawRoom(room);
 
 
-        var startPos = GetPlayerStartingPosition(layout.startingRoom);
+        var startPos = GetPlayerStartingPosition(room);
+
         var player = CreatePlayerGameObject(startPos);
         playerUnit = new PlayerControlledUnit();
         playerUnit.gameObject = player;
@@ -66,7 +69,7 @@ public class BoardManager : MonoBehaviour
         }
 
         for (var i = 0; i < 5; i++) { 
-            var randomWalkablePos = GetRandomWalkablePosition(layout.startingRoom);
+            var randomWalkablePos = GetRandomWalkablePosition(room);
             var enemy = CreateEnemyGameObject(randomWalkablePos);
             Unit enemyUnit = new AIControlledUnit();
             enemyUnit.gameObject = enemy;
@@ -86,6 +89,58 @@ public class BoardManager : MonoBehaviour
 
         TurnSystem.Instance.BeginFirstTurn();
     }
+
+    internal void MakeUnitDie(Unit unit)
+    {
+        if (enemyUnits.Contains(unit)) {
+            Destroy(unit.gameObject);
+            enemyUnits.Remove(unit);
+            TurnSystem.Instance.RemoveUnit(unit);
+            if (enemyUnits.Count == 0 ) {
+                EndLevel();
+            }
+        }
+        if (playerUnit == unit) {
+            Destroy(unit.gameObject);
+            playerUnit = null;
+            ResetBoardManager();
+            EndGameScreen();
+        }
+    }
+
+    public void ResetBoardManager() {
+        ClearRoom(room);
+        room = null;
+        foreach (var enemy in enemyUnits)
+        {
+            Destroy(enemy.gameObject);
+        }
+        enemyUnits.Clear();
+
+        TurnSystem.Instance.ResetTurnSystem();
+
+        OverlayController.Instance.ClearHighlightForCursor();
+        OverlayController.Instance.ClearTargetTiles();
+        OverlayController.Instance.ClearWalkableTiles();
+
+        PlayerUIManager.Instance.DisablePlayerUi();
+
+        InputHandler.Instance.Reset();
+    }
+
+    void EndLevel() {
+        ResetBoardManager();
+        if (levelReached < 15) { 
+            
+        }
+    }
+
+    void EndGameScreen()
+    {
+        
+    }
+
+
 
     private static Vector2Int GetPlayerStartingPosition(Room room) {
         var width = room.GetWidth();
@@ -109,7 +164,7 @@ public class BoardManager : MonoBehaviour
 
         var tries = 10;
         while (tries > 0) { 
-            var tilePosToCheck = new Vector2Int(Random.Range(0, width - 1), Random.Range(0, height - 1));
+            var tilePosToCheck = new Vector2Int(Random.Range(0, width), Random.Range(0, height));
 
             if (room.GetTile(tilePosToCheck).so.isWalkable) {
                 return tilePosToCheck;
@@ -119,15 +174,10 @@ public class BoardManager : MonoBehaviour
         return new Vector2Int();
     }
 
-
-    private static LevelLayout GetEmptyLayout() {
-        LevelLayout layout = new LevelLayout();
-        return layout;
-    }
-
     private Room GenerateRoom() {
 
         var imageIndex = Random.Range(0, levelTextures.Count);
+        Debug.Log("imageIndex" + imageIndex);
         var image = levelTextures[imageIndex];
         Room room = GenerateRoomFromTexture2D(image);
         return room;
@@ -178,11 +228,23 @@ public class BoardManager : MonoBehaviour
                 var tile = room.GetTile(position);
                 if (tile.so != null)
                 {
-                    var randomIndex = Random.Range(0, tile.so.prefabs.Count - 1);
+                    var randomIndex = Random.Range(0, tile.so.prefabs.Count);
                     var randomPrefab = tile.so.prefabs[randomIndex];
                     var instanceTile = Instantiate(randomPrefab, new Vector2(i, j), Quaternion.identity, boardGameObject.transform);
                     tile.tile = instanceTile;
                 }
+            }
+        }
+    }
+
+    private void ClearRoom(Room room)
+    {
+        for (var j = 0; j < room.GetHeight(); j++)
+        {
+            for (var i = 0; i < room.GetWidth(); i++)
+            {
+                var tile = room.GetTile(new Vector2Int(i,j));
+                Destroy(tile.tile);
             }
         }
     }

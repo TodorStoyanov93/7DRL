@@ -15,6 +15,8 @@ public class PlayerUIManager : MonoBehaviour
     private GameObject playerUi;
     private GameObject diceContainer;
 
+    private GameObject diceTooltip;
+
     public List<UiDice> uiDices;
     private Vector2 originalDiceSize;
     private Vector2 originalDiceOffset;
@@ -32,6 +34,7 @@ public class PlayerUIManager : MonoBehaviour
         Instance = this;
         playerUi = GameObject.Find("PlayerUI");
         diceContainer = playerUi.transform.Find("DiceUI").gameObject;
+        diceTooltip = playerUi.transform.Find("DiceTooltipContainer").gameObject;
         uiDices = new List<UiDice>();
         originalDiceSize = dicePrefab.transform.Find("ImagesContainer").GetComponent<RectTransform>().sizeDelta;
         originalDiceOffset = dicePrefab.transform.Find("ImagesContainer").GetComponent<RectTransform>().anchoredPosition;
@@ -58,11 +61,13 @@ public class PlayerUIManager : MonoBehaviour
 
     public void EnablePlayerUi() {
         playerUi.SetActive(true);
+        diceTooltip.SetActive(false);
     }
 
     public void DisablePlayerUi()
     {
         playerUi.SetActive(false);
+        diceTooltip.SetActive(false);
     }
 
     public void ClearCardView() {
@@ -100,14 +105,10 @@ public class PlayerUIManager : MonoBehaviour
             var foregroundImageImage = foregroundImageGo.GetComponent<Image>();
             foregroundImageImage.sprite = curr.chosenSide.foregroundImage;
 
-            if (curr.chosenSide.backgroundImage == null)
-            {
-                Debug.Log("Background image missing for dice" + curr.diceDataRef.diceName);
-            }
 
             var backgroundImageGo = imageContainer.transform.Find("BackgroundImage");
             var backgroundImageImage = backgroundImageGo.GetComponent<Image>();
-            backgroundImageImage.sprite = curr.chosenSide.backgroundImage;
+            backgroundImageImage.color = curr.chosenSide.backgroundColor;
 
             var activeImageGo = imageContainer.transform.Find("ActiveImage");
             var activeImageImage = activeImageGo.GetComponent<Image>();
@@ -241,7 +242,6 @@ public class PlayerUIManager : MonoBehaviour
         var isActive = currentClickedDice.activatableDice.isActive;
         GameObject imageContainer = currentClickedDice.diceGameObject.transform.Find("ImagesContainer").gameObject;
 
-        var backgroundImageGo = imageContainer.transform.Find("BackgroundImage");
         var activeImageGo = imageContainer.transform.Find("ActiveImage");
         var activeImageImage = activeImageGo.GetComponent<Image>();
         if (isActive)
@@ -285,5 +285,82 @@ public class PlayerUIManager : MonoBehaviour
         GameObject image = uiDice.diceGameObject.transform.Find("ImagesContainer").gameObject;
         EventTrigger eventTriggerComponent = image.GetComponent<EventTrigger>();
         eventTriggerComponent.triggers.ForEach(i => i.callback.RemoveAllListeners());
+    }
+
+    public void ShowDiceTooltip(ActivatableDice activatableDice) {
+        diceTooltip.SetActive(true);
+        var diceTooltipObj = diceTooltip.transform.Find("DiceTooltip");
+
+        Debug.Log(activatableDice.chosenSide.description);
+
+
+        var diceName = diceTooltipObj.transform.Find("DiceName");
+        var diceNameText = diceName.GetComponent<Text>();
+        diceNameText.text = activatableDice.diceDataRef.diceName;
+        var diceSideContainer = diceTooltipObj.transform.Find("DiceSidesContainer");
+
+        var chosenSideData = activatableDice.chosenSide;
+
+        var diceSideTop = diceSideContainer.transform.Find("SideTop").gameObject;
+        var diceSideTopData = activatableDice.diceDataRef.sideTop;
+        var isActiveTop = activatableDice.chosenSideOfDice == SideOfDice.Top;
+        SetSideForTooltip(diceSideTop, diceSideTopData,isActiveTop);
+
+        var diceSideBottom = diceSideContainer.transform.Find("SideBottom").gameObject;
+        var diceSideBottomData = activatableDice.diceDataRef.sideBottom;
+        var isActiveBottom = activatableDice.chosenSideOfDice == SideOfDice.Bottom;
+        SetSideForTooltip(diceSideBottom, diceSideBottomData, isActiveBottom);
+
+        var diceSideLeft = diceSideContainer.transform.Find("SideLeft").gameObject;
+        var diceSideLeftData = activatableDice.diceDataRef.sideLeft;
+        var isActiveLeft = activatableDice.chosenSideOfDice == SideOfDice.Left;
+        SetSideForTooltip(diceSideLeft, diceSideLeftData, isActiveLeft);
+
+        var diceSideRight = diceSideContainer.transform.Find("SideRight").gameObject;
+        var diceSideRightData = activatableDice.diceDataRef.sideRight;
+        var isActiveRight = activatableDice.chosenSideOfDice == SideOfDice.Right;
+        SetSideForTooltip(diceSideRight, diceSideRightData, isActiveRight);
+
+        var diceSideFront = diceSideContainer.transform.Find("SideFront").gameObject;
+        var diceSideFrontData = activatableDice.diceDataRef.sideFront;
+        var isActiveFront = activatableDice.chosenSideOfDice == SideOfDice.Front;
+        SetSideForTooltip(diceSideFront, diceSideFrontData, isActiveFront);
+
+        var diceSideBack = diceSideContainer.transform.Find("SideBack").gameObject;
+        var diceSideBackData = activatableDice.diceDataRef.sideBack;
+        var isActiveBack = activatableDice.chosenSideOfDice == SideOfDice.Back;
+        SetSideForTooltip(diceSideBack, diceSideBackData, isActiveBack);
+
+    }
+
+    private void SetSideForTooltip(GameObject diceSiceContainerContainer, SideData sideData, bool isActive) {
+
+        var imageContainer = diceSiceContainerContainer.transform.Find("Side");
+
+        var foregroundImageGo = imageContainer.transform.Find("ForegroundImage");
+        var foregroundImageImage = foregroundImageGo.GetComponent<Image>();
+        foregroundImageImage.sprite = sideData.foregroundImage;
+
+
+        var backgroundImageGo = imageContainer.transform.Find("BackgroundImage");
+        var backgroundImageImage = backgroundImageGo.GetComponent<Image>();
+        backgroundImageImage.color = sideData.backgroundColor;
+
+        var activeImageGo = imageContainer.transform.Find("ActiveImage");
+        var activeImageImage = activeImageGo.GetComponent<Image>();
+
+        if (isActive)
+        {
+            activeImageImage.color = Color.green;
+        }
+        else
+        {
+            activeImageImage.color = new Color(0, 0, 0, 0);
+        }
+
+    }
+
+    public void HideDiceTooltip() {
+        diceTooltip.SetActive(false);
     }
 }

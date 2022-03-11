@@ -106,7 +106,7 @@ public class OverlayController : MonoBehaviour
 
     public void OverlayWalkableTilesForPlayer() {
         var player = BoardManager.Instance.playerUnit.gameObject;
-        var room = BoardManager.Instance.layout.startingRoom;
+        var room = BoardManager.Instance.room;
         var playerPosition = player.transform.position;
         Vector2Int playerPosInt = new Vector2Int(Mathf.RoundToInt(playerPosition.x), Mathf.RoundToInt(playerPosition.y));
 

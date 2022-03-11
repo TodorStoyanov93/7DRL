@@ -11,7 +11,7 @@ public class AttackInRangeSide : SideData
 
     public override void OnUse(Vector2Int target)
     {
-        Debug.Log("Side use" + this);
+        ActionExecutor.Instance.DealDamageInTile(target, power);
     }
 
     public override List<Vector2Int> GetValidTargets(Vector2Int casterPosition) {
@@ -27,7 +27,7 @@ public class AttackInRangeSide : SideData
 
         List<Vector2Int> validTiles = tilePositionsToCheck.Where(i =>
         {
-            var tile = BoardManager.Instance.layout.startingRoom.GetTile(i);
+            var tile = BoardManager.Instance.room.GetTile(i);
             if (tile == null || !tile.so.isWalkable)
             {
                 return false;

@@ -8,7 +8,6 @@ public class RogueGameManager : MonoBehaviour
 
     GameObject mainMenu;
     BoardManager boardManager;
-    // Start is called before the first frame update
 
     private void Awake()
     {

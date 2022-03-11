@@ -6,6 +6,9 @@ public class AnimationManager : MonoBehaviour
 { 
     public static AnimationManager Instance { get; private set; }
 
+    public GameObject blastAnimationObject;
+    public GameObject shieldAnimationObject;
+
     private void Awake()
     {
         Instance = this;
@@ -34,6 +37,13 @@ public class AnimationManager : MonoBehaviour
         animator.SetBool("move", false);
     }
 
+    public IEnumerator PlayBlastAnimationCoroutine(Vector2Int position) {
+        var anim = Instantiate(blastAnimationObject,new Vector3(position.x,position.y,0),Quaternion.identity);
+        yield return new WaitForSeconds(0.3f);
+        Destroy(anim);
+    }
+
+
     public void PlayAttackAnimation(Unit unit) {
         var animator = unit.gameObject.GetComponent<Animator>();
         animator.SetTrigger("attack");
@@ -59,5 +69,11 @@ public class AnimationManager : MonoBehaviour
         }
     }
 
+    public void PlayDeadAnimation(Unit unit)
+    {
+        //var animator = unit.gameObject.GetComponent<Animator>();
+        //animator.SetTrigger("dead");
 
+        unit.gameObject.transform.rotation = Quaternion.Euler(0,0,90);
+    }
 }

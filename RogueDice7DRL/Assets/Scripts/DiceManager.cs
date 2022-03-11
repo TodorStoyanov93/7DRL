@@ -16,7 +16,8 @@ public class DiceManager : MonoBehaviour
     }
 
     public DiceData GetRandomDiceFromList() {
-        int randomInt = Random.Range(0,diceList.Count-1);
+        int randomInt = Random.Range(0,diceList.Count);
+
         DiceData dice = diceList[randomInt];
         return dice;
     }

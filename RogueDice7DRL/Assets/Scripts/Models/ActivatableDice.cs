@@ -25,7 +25,7 @@ public class ActivatableDice
         return result;
     }
 
-    private void ChooseRandomSide() {
+    public void ChooseRandomSide() {
 
         int i = Random.Range(0,5);
 

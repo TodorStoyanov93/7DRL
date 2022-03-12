@@ -26,18 +26,15 @@ public class AIControlledUnit : Unit
             Vector2Int targetPosition = Helpers.RoundToVector2Int(this.gameObject.transform.position) + randomDirection;
 
             var coroutine = MoveUnitCoroutine(this, targetPosition);
-            GameplayController.Instance.StartCoroutine(coroutine);
+            ActionExecutor.Instance.StartCoroutine(coroutine);
         }
-
-
-
         
     }
 
     IEnumerator MoveUnitCoroutine(Unit unit, Vector2Int position)
     {
         var unitPos = Helpers.RoundToVector2Int(unit.gameObject.transform.position);
-        var diff = position - Helpers.RoundToVector2Int(unitPos);
+        var diff = position - unitPos;
         bool isIn2Range = diff.magnitude <= 2.0f;
         var tile = BoardManager.Instance.room.GetTile(position);
         if (tile!= null) { 
@@ -47,8 +44,8 @@ public class AIControlledUnit : Unit
             {
                 float duration = 0.5f;
                 AnimationManager.Instance.PlayMoveAnimation(unit);
-                var smoothFollow = GameplayController.Instance.StartCoroutine(CameraController.Instance.FollowSmooth(this.gameObject, duration));
-                var smoothMove = GameplayController.Instance.StartCoroutine(GameplayController.Instance.SmoothMove(this.gameObject, position, duration));
+                var smoothFollow = ActionExecutor.Instance.StartCoroutine(CameraController.Instance.FollowSmooth(this.gameObject, duration));
+                var smoothMove = ActionExecutor.Instance.StartCoroutine(ActionExecutor.Instance.SmoothMove(this.gameObject, position, duration));
                 yield return smoothFollow;
                 yield return smoothMove;
                 AnimationManager.Instance.StopMoveAnimation(unit);

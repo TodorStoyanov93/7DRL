@@ -7,6 +7,10 @@ using Random = UnityEngine.Random;
 
 public class BoardManager : MonoBehaviour
 {
+    private int roomsCleared = 0;
+    private int enemiesKilled = 0;
+    public int playerTurns = 0;
+
     public List<Texture2D> levelTextures;
     public List<TileScriptableObject> levelMapping;
 
@@ -24,6 +28,8 @@ public class BoardManager : MonoBehaviour
     public int levelReached = 1;
 
     public Room room;
+
+    public GameObject healthBarPrefab;
 
     public static BoardManager Instance { get; private set; }
     public void Awake()
@@ -46,7 +52,33 @@ public class BoardManager : MonoBehaviour
         
     }
 
-    public void StartGame() {
+    public void CreatePlayer() {
+        var player = CreatePlayerGameObject();
+        var healthBar = Instantiate(healthBarPrefab,player.transform);
+        playerUnit = new PlayerControlledUnit()
+        {
+            maxHealth = 10,
+        };
+        playerUnit.SetHealth(10);
+        
+        playerUnit.SetGameobject(player);
+        for (var i = 0; i < 2; i++)
+        {
+            AddSingleRandomDiceToPlayer();
+        }
+    }
+
+    private void AddSingleRandomDiceToPlayer() {
+        DiceData randomDice = DiceManager.Instance.GetRandomDiceFromList();
+
+        ActivatableDice activatableDice = ActivatableDice.CreateActivatableDice(true, randomDice);
+        playerUnit.dices.Add(activatableDice);
+
+    }
+
+
+
+    public void StartNewLevel() {
         enemyUnits = new List<Unit>();
         var room = GenerateRoom();
         this.room = room;
@@ -55,29 +87,24 @@ public class BoardManager : MonoBehaviour
 
 
         var startPos = GetPlayerStartingPosition(room);
+        playerUnit.gameObject.transform.position = new Vector3(startPos.x,startPos.y,0);
+        TurnSystem.Instance.units.Insert(0,playerUnit);
 
-        var player = CreatePlayerGameObject(startPos);
-        playerUnit = new PlayerControlledUnit();
-        playerUnit.gameObject = player;
-        TurnSystem.Instance.units.Add(playerUnit);
-
-        for (var i = 0; i < 7; i++) { 
-            DiceData randomDice = DiceManager.Instance.GetRandomDiceFromList();
-        
-            ActivatableDice activatableDice = ActivatableDice.CreateActivatableDice(true,randomDice);
-            playerUnit.dices.Add(activatableDice);
-        }
-
-        for (var i = 0; i < 5; i++) { 
+        for (var i = 0; i < levelReached; i++) { 
             var randomWalkablePos = GetRandomWalkablePosition(room);
             var enemy = CreateEnemyGameObject(randomWalkablePos);
-            Unit enemyUnit = new AIControlledUnit();
-            enemyUnit.gameObject = enemy;
+            var healthBar = Instantiate(healthBarPrefab, enemy.transform);
+            Unit enemyUnit = new AIControlledUnit()
+            {
+                maxHealth = 5,
+            };
+            enemyUnit.SetHealth(5);
+            enemyUnit.SetGameobject(enemy);
             TurnSystem.Instance.units.Add(enemyUnit);
             enemyUnits.Add(enemyUnit);
         }
 
-        CameraController.Instance.SnapTo(player);
+        CameraController.Instance.SnapTo(playerUnit.gameObject);
 
         PlayerUIManager.Instance.ClearCardView();
         PlayerUIManager.Instance.DrawCardView();
@@ -90,7 +117,7 @@ public class BoardManager : MonoBehaviour
         TurnSystem.Instance.BeginFirstTurn();
     }
 
-    internal void MakeUnitDie(Unit unit)
+    internal void MakeUnitDie(Unit unit)    
     {
         if (enemyUnits.Contains(unit)) {
             Destroy(unit.gameObject);
@@ -99,12 +126,19 @@ public class BoardManager : MonoBehaviour
             if (enemyUnits.Count == 0 ) {
                 EndLevel();
             }
+            enemiesKilled++;
         }
         if (playerUnit == unit) {
             Destroy(unit.gameObject);
             playerUnit = null;
             ResetBoardManager();
+            
             EndGameScreen();
+        }
+
+        if (unit == TurnSystem.Instance.currentUnit)
+        {
+            TurnSystem.Instance.EndTurn();
         }
     }
 
@@ -123,21 +157,34 @@ public class BoardManager : MonoBehaviour
         OverlayController.Instance.ClearTargetTiles();
         OverlayController.Instance.ClearWalkableTiles();
 
-        PlayerUIManager.Instance.DisablePlayerUi();
 
-        InputHandler.Instance.Reset();
+        InputHandler.Instance.ResetInputHandler();
+        PlayerUIManager.Instance.DisablePlayerUi();
+        InputController.Instance.StopWaitingForInput();
+
     }
 
     void EndLevel() {
+        levelReached++;
+        roomsCleared++;
         ResetBoardManager();
-        if (levelReached < 15) { 
-            
+        if (levelReached < 5) {
+            AddSingleRandomDiceToPlayer();
+            StartNewLevel();
+        } else {
+            EndGameScreen();
         }
     }
 
     void EndGameScreen()
     {
-        
+        RogueGameManager.Instance.ShowEndScreen(roomsCleared,enemiesKilled,playerTurns);
+    }
+
+    public void ResetCounters() {
+        roomsCleared = 0;
+        playerTurns = 0;
+        enemiesKilled = 0;
     }
 
 
@@ -249,9 +296,8 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    private GameObject CreatePlayerGameObject(Vector2Int startPos) {
-        var player = Instantiate(playerPrefab, 
-            new Vector3(startPos.x, startPos.y, 0), Quaternion.identity, boardGameObject.transform);
+    private GameObject CreatePlayerGameObject() {
+        var player = Instantiate(playerPrefab, new Vector3(), Quaternion.identity, boardGameObject.transform);
         return player;
     }
 

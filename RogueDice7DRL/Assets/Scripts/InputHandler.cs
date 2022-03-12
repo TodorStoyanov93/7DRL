@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InputHandler : MonoBehaviour
 {
@@ -9,16 +10,9 @@ public class InputHandler : MonoBehaviour
 
     public static InputHandler Instance { get; private set; }
 
-    private Unit _playerUnit;
-    private Unit PlayerUnit { get {
-            if (_playerUnit == null) {//may become invalid when changing rooms
-                _playerUnit = BoardManager.Instance.playerUnit;
-            }
-            return _playerUnit;
-        }
-    }
-
     private ActivatableDice selectedDice;
+
+    private GameObject rollButton;
 
     void Awake() {
         Instance = this;
@@ -50,7 +44,7 @@ public class InputHandler : MonoBehaviour
     {
         if (playerInputState == PlayerInputState.Default)
         {
-            Vector2Int unitPosition = PlayerUnit.GetVector2IntPosition();
+            Vector2Int unitPosition = BoardManager.Instance.playerUnit.GetVector2IntPosition();
             if (ActionExecutor.Instance.IsValidMove(unitPosition, hitGoPos))
             {
                 StartCoroutine(MovePlayer(hitGoPos));
@@ -65,8 +59,8 @@ public class InputHandler : MonoBehaviour
             var playerPos = BoardManager.Instance.playerUnit.GetVector2IntPosition();
             if (ActionExecutor.Instance.IsValidTarget(playerPos, selectedDice.chosenSide, hitGoPos))
             {
-                
-                
+
+
                 selectedDice.chosenSide.OnUse(hitGoPos);
                 selectedDice.isActive = false;
                 PlayerUIManager.Instance.RefreshCurrentDiceActive();
@@ -77,7 +71,7 @@ public class InputHandler : MonoBehaviour
                 OverlayController.Instance.ClearTargetTiles();
                 playerInputState = PlayerInputState.Default;
                 OverlayController.Instance.OverlayWalkableTilesForPlayer();
-
+                SetRollButtonEnabled(true);
             }
             else
             {
@@ -86,19 +80,19 @@ public class InputHandler : MonoBehaviour
             }
 
         }
-        else if (playerInputState == PlayerInputState.ChoseCard) {
-
+        else if (playerInputState == PlayerInputState.Undefined) { 
+        
         }
     }
 
     IEnumerator MovePlayer(Vector2Int moveTarget) {
         playerInputState = PlayerInputState.Undefined;
+        SetRollButtonEnabled(false);
         //InputController.Instance.StopWaitingForInput();
         OverlayController.Instance.ClearWalkableTiles();
-        yield return StartCoroutine(ActionExecutor.Instance.MoveUnitCoroutine(PlayerUnit, moveTarget));
+        yield return StartCoroutine(ActionExecutor.Instance.MoveUnitCoroutine(BoardManager.Instance.playerUnit, moveTarget));
 
         TurnSystem.Instance.EndTurn();
-
     }
 
 
@@ -108,18 +102,22 @@ public class InputHandler : MonoBehaviour
     {
         if (playerInputState == PlayerInputState.Default)
         {
-            AnimationManager.Instance.PlayAttackAnimation(PlayerUnit);
+
         }
         else if (playerInputState == PlayerInputState.ChoseTarget)
         {
-            
+
             PlayerUIManager.Instance.CancelCurrentDice();
             PlayerUIManager.Instance.HideDiceTooltip();
             OverlayController.Instance.ClearTargetTiles();
 
             playerInputState = PlayerInputState.Default;
+            SetRollButtonEnabled(true);
             OverlayController.Instance.OverlayWalkableTilesForPlayer();
         }
+        else if (playerInputState == PlayerInputState.Undefined) { 
+        
+        } 
     }
 
     internal void DiceClicked(ActivatableDice activatableDice)
@@ -132,6 +130,7 @@ public class InputHandler : MonoBehaviour
                 var playerPos = BoardManager.Instance.playerUnit.GetVector2IntPosition();
                 var validTargets = activatableDice.chosenSide.GetValidTargets(playerPos);
                 playerInputState = PlayerInputState.ChoseTarget;
+                SetRollButtonEnabled(false);
                 OverlayController.Instance.OverlayTargetTiles(validTargets);
                 selectedDice = activatableDice;
                 PlayerUIManager.Instance.ShowDiceTooltip(activatableDice);
@@ -164,7 +163,7 @@ public class InputHandler : MonoBehaviour
         }
         else if (playerInputState == PlayerInputState.Undefined)
         {
-            Debug.Log(" DiceClicked State Undefined");
+
         }
     }
 
@@ -174,32 +173,56 @@ public class InputHandler : MonoBehaviour
     }
 
     public void RollClicked() {
-        Debug.Log("Roll");
+        StartCoroutine(Roll());
     }
+
+    IEnumerator Roll() {
+        if (playerInputState == PlayerInputState.Default) {
+            playerInputState = PlayerInputState.Undefined;
+            OverlayController.Instance.ClearWalkableTiles();
+            SetRollButtonEnabled(false);
+            yield return StartCoroutine(ActionExecutor.Instance.RollCoroutine());
+
+            TurnSystem.Instance.EndTurn();
+        }
+    }
+
+
 
     public void CheatClicked() { 
         
     }
 
     public void TurnBeginsForPlayer() {
-        if (playerInputState == PlayerInputState.Undefined) { 
+        if (playerInputState == PlayerInputState.Undefined) {
             if (selectedDice == null)
             {
                 playerInputState = PlayerInputState.Default;
                 OverlayController.Instance.OverlayWalkableTilesForPlayer();
-
+                SetRollButtonEnabled(true);
             }
             else {
                 playerInputState = PlayerInputState.ChoseTarget;
                 var playerPos = BoardManager.Instance.playerUnit.GetVector2IntPosition();
                 var validTargets = selectedDice.chosenSide.GetValidTargets(playerPos);
                 OverlayController.Instance.OverlayTargetTiles(validTargets);
+                SetRollButtonEnabled(false);
             }
         }
     }
 
-    public void Reset() {
+    public void ResetInputHandler() {
         playerInputState = PlayerInputState.Undefined;
+        SetRollButtonEnabled(false);
+    }
+
+    private void SetRollButtonEnabled(bool enabled) {
+        var playerUi = GameObject.Find("PlayerUI");
+        var rollContainer = playerUi.transform.Find("RollContainer");
+        var rollButton = rollContainer.transform.Find("RollButton");
+
+        Button button = rollButton.GetComponent<Button>();
+        button.interactable = enabled;
     }
 
 }

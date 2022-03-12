@@ -5,6 +5,5 @@ using UnityEngine;
 public enum PlayerInputState { 
     Undefined = 0,
     Default = 1,
-    ChoseTarget = 2,
-    ChoseCard = 3,
+    ChoseTarget = 2
 }

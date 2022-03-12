@@ -11,7 +11,11 @@ public class DefendSide : SideData
 
     public override void OnUse(Vector2Int target)
     {
-        Debug.Log("Side use" + this);
+        ActionExecutor.Instance.StartCoroutine(OnDiceUse(target));
+    }
+
+    IEnumerator OnDiceUse(Vector2Int target) {
+        yield return ActionExecutor.Instance.StartCoroutine(ActionExecutor.Instance.ApplyShieldInTile(target, power));
     }
 
     public override List<Vector2Int> GetValidTargets(Vector2Int casterPosition) {

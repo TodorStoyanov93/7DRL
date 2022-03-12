@@ -12,6 +12,7 @@ public class InputController : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        isActive = false;
     }
 
 
@@ -65,7 +66,8 @@ public class InputController : MonoBehaviour
         isActive = true;
     }
 
-    //internal void StopWaitingForInput() {
-    //    isActive = false;
-    //}
+    internal void StopWaitingForInput()
+    {
+        isActive = false;
+    }
 }

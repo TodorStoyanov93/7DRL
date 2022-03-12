@@ -17,6 +17,39 @@ public class ActionExecutor : MonoBehaviour
         Instance = this;
     }
 
+    public IEnumerator ApplyShieldInTile(Vector2Int position, int shield) {
+        yield return StartCoroutine(ApplyShieldInTileCoroutine(position, shield));
+    }
+
+    IEnumerator ApplyShieldInTileCoroutine(Vector2Int position, int shield  )
+    {
+        var tileAnimationCoroutine = StartCoroutine(AnimationManager.Instance.PlayBlastAnimationCoroutine(position));
+
+        var enemyHit = BoardManager.Instance.enemyUnits.Find(enemy => enemy.GetVector2IntPosition() == position);
+        if (enemyHit != null)
+        {
+            yield return StartCoroutine(ApplyShield(enemyHit, shield));
+        }
+        else
+        {
+            var playerIsHit = BoardManager.Instance.playerUnit.GetVector2IntPosition() == position;
+            if (playerIsHit)
+            {
+                yield return StartCoroutine(ApplyShield(BoardManager.Instance.playerUnit, shield));
+            }
+        }
+
+        yield return tileAnimationCoroutine;
+    }
+
+
+    IEnumerator ApplyShield(Unit unit, int shield)
+    {
+        unit.SetShield(shield);
+
+        yield break;
+    }
+
     public IEnumerator DealDamageInTile(Vector2Int position, int damage)
     {
         yield return StartCoroutine(DealDamageInTileCoroutine(position,damage));
@@ -29,26 +62,28 @@ public class ActionExecutor : MonoBehaviour
             if (damage >= unit.shield)
             {
                 remainingDamage = damage - unit.shield;
-                unit.shield = 0;
+                unit.SetShield(0);
 
             }
             else
             {
                 remainingDamage = 0;
-                unit.shield = damage - unit.shield;
+                unit.SetShield(damage - unit.shield);
 
             }
+        } else {
+            remainingDamage = damage;
         }
 
         if (unit.currentHealth > 0)
         {
-            if (remainingDamage > unit.currentHealth)
+            if (remainingDamage < unit.currentHealth)
             {
-                unit.currentHealth -= remainingDamage;
+                unit.SetHealth(unit.currentHealth - remainingDamage);
             }
             else
             {
-                unit.currentHealth = 0;
+                unit.SetHealth(0);
                 yield return StartCoroutine(MakeUnitDie(unit));
             }
         }
@@ -93,17 +128,11 @@ public class ActionExecutor : MonoBehaviour
 
     public IEnumerator MoveUnitCoroutine(Unit unit, Vector2Int moveTargetPosition)
     {
-        if (!IsValidMove(unit.GetVector2IntPosition(), moveTargetPosition)) {
-            Debug.Log("Move is Invalid");
-            throw new Exception("Move is Invalid");
-        }
-
-        //SwitchPlayerInputState(PlayerInputState.Undefined);
         float duration = 0.5f;
         AnimationManager.Instance.PlayMoveAnimation(unit);
         AnimationManager.Instance.TurnSprite(unit, moveTargetPosition);
-        var smoothFollow = GameplayController.Instance.StartCoroutine(CameraController.Instance.FollowSmooth(BoardManager.Instance.playerUnit.gameObject, duration));
-        var smoothMove = GameplayController.Instance.StartCoroutine(GameplayController.Instance.SmoothMove(BoardManager.Instance.playerUnit.gameObject, moveTargetPosition, duration));
+        var smoothFollow = StartCoroutine(CameraController.Instance.FollowSmooth(BoardManager.Instance.playerUnit.gameObject, duration));
+        var smoothMove = StartCoroutine(ActionExecutor.Instance.SmoothMove(BoardManager.Instance.playerUnit.gameObject, moveTargetPosition, duration));
         yield return smoothFollow;
         yield return smoothMove;
         AnimationManager.Instance.StopMoveAnimation(unit);
@@ -134,5 +163,52 @@ public class ActionExecutor : MonoBehaviour
     {
         List<Vector2Int> validTargets = clickedDiceSide.GetValidTargets(unitPosition);
         return validTargets.Contains(hitGoPos);
+    }
+
+    public IEnumerator SmoothMove(GameObject gameObject, Vector2 desiredPosition, float duration)
+    {
+        float timeElapsed = 0f;
+        Vector3 start = gameObject.transform.position;
+        while (timeElapsed <= duration)
+        {
+
+            var lerpedValue = Vector3.Lerp(start, desiredPosition, timeElapsed / duration);
+
+            gameObject.transform.position = lerpedValue;
+            yield return null;
+            timeElapsed += Time.deltaTime;
+        }
+
+        gameObject.transform.position = desiredPosition;
+
+        yield break;
+    }
+
+
+    public IEnumerator RollCoroutine() {
+        List<Coroutine> coroutines = new List<Coroutine>();
+        for (int i = 0; i < BoardManager.Instance.playerUnit.dices.Count; i++) {
+            var currDice = BoardManager.Instance.playerUnit.dices[i];
+            currDice.isActive = false;
+            var c = StartCoroutine(RollSingleDice(currDice));
+            coroutines.Add(c);
+        }
+        
+
+        foreach (var coroutine in coroutines) {
+            yield return coroutine;
+        }
+
+    }
+    IEnumerator RollSingleDice(ActivatableDice activatableDice) {
+        for (var i = 0; i < 10; i++) { 
+            activatableDice.ChooseRandomSide();
+            PlayerUIManager.Instance.RefreshDiceUi(activatableDice);
+            yield return new WaitForSeconds(UnityEngine.Random.Range(0.05f, 0.50f));
+
+        }
+        activatableDice.isActive = true;
+        PlayerUIManager.Instance.RefreshDiceUi(activatableDice);
+        yield break;
     }
 }

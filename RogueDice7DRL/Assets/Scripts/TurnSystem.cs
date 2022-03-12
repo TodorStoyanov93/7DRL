@@ -9,7 +9,6 @@ public class TurnSystem : MonoBehaviour
     public Unit currentUnit;
     private int currentActorIndex;
     public static TurnSystem Instance { get; private set; }
-
     void Awake()
     {
         Instance = this;
@@ -72,6 +71,10 @@ public class TurnSystem : MonoBehaviour
 
     public void EndTurn()
     {
+        if (currentUnit == BoardManager.Instance.playerUnit) {
+            BoardManager.Instance.playerTurns++;
+        }
+
         if (units.Count > 0) { 
             SetCurrentActorNext();
             StartCoroutine(BeginTurn());
@@ -82,9 +85,8 @@ public class TurnSystem : MonoBehaviour
     {
         for (var i = 0; i < units.Count; i++) {
             var curr = units[i];
-            if (curr == unit) {
-
-
+            if (curr == unit)
+            {
                 units.RemoveAt(i);
 
                 if (currentActorIndex > i)

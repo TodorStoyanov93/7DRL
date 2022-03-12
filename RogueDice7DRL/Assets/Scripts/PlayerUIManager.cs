@@ -32,7 +32,8 @@ public class PlayerUIManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        playerUi = GameObject.Find("PlayerUI");
+        var canvas = GameObject.Find("Canvas");
+        playerUi = canvas.transform.Find("PlayerUI").gameObject;
         diceContainer = playerUi.transform.Find("DiceUI").gameObject;
         diceTooltip = playerUi.transform.Find("DiceTooltipContainer").gameObject;
         uiDices = new List<UiDice>();
@@ -96,30 +97,7 @@ public class PlayerUIManager : MonoBehaviour
             var createdInstance = Instantiate(dicePrefab, Vector3.zero, Quaternion.identity, diceContainer.transform);
             GameObject imageContainer = createdInstance.transform.Find("ImagesContainer").gameObject;
 
-            if (curr.chosenSide.foregroundImage == null)
-            {
-                Debug.Log("Foreground image missing for dice" + curr.diceDataRef.diceName);
-            }
-
-            var foregroundImageGo = imageContainer.transform.Find("ForegroundImage");
-            var foregroundImageImage = foregroundImageGo.GetComponent<Image>();
-            foregroundImageImage.sprite = curr.chosenSide.foregroundImage;
-
-
-            var backgroundImageGo = imageContainer.transform.Find("BackgroundImage");
-            var backgroundImageImage = backgroundImageGo.GetComponent<Image>();
-            backgroundImageImage.color = curr.chosenSide.backgroundColor;
-
-            var activeImageGo = imageContainer.transform.Find("ActiveImage");
-            var activeImageImage = activeImageGo.GetComponent<Image>();
-            if (curr.isActive)
-            {
-                activeImageImage.color = Color.green;
-            }
-            else
-            {
-                activeImageImage.color = new Color(0, 0, 0, 0);
-            }
+            ApplyPropsToImage(imageContainer, curr);
 
             UiDice uiDice = new UiDice()
             {
@@ -135,6 +113,34 @@ public class PlayerUIManager : MonoBehaviour
         ResetSortingOrderForAllDice();
     }
 
+    void ApplyPropsToImage(GameObject imageContainer, ActivatableDice curr)
+    {
+
+        if (curr.chosenSide.foregroundImage == null)
+        {
+            Debug.Log("Foreground image missing for dice" + curr.diceDataRef.diceName);
+        }
+
+        var foregroundImageGo = imageContainer.transform.Find("ForegroundImage");
+        var foregroundImageImage = foregroundImageGo.GetComponent<Image>();
+        foregroundImageImage.sprite = curr.chosenSide.foregroundImage;
+
+
+        var backgroundImageGo = imageContainer.transform.Find("BackgroundImage");
+        var backgroundImageImage = backgroundImageGo.GetComponent<Image>();
+        backgroundImageImage.color = curr.chosenSide.backgroundColor;
+
+        var activeImageGo = imageContainer.transform.Find("ActiveImage");
+        var activeImageImage = activeImageGo.GetComponent<Image>();
+        if (curr.isActive)
+        {
+            activeImageImage.color = Color.green;
+        }
+        else
+        {
+            activeImageImage.color = new Color(0, 0, 0, 0);
+        }
+    }
 
     private void SetDiceByState(UiDice uiDice) {
 
@@ -363,4 +369,14 @@ public class PlayerUIManager : MonoBehaviour
     public void HideDiceTooltip() {
         diceTooltip.SetActive(false);
     }
+
+    public void RefreshDiceUi(ActivatableDice activatableDice) {
+        var found = uiDices.Find(i => i.activatableDice == activatableDice);
+
+        if (found != null) {
+            GameObject imageContainer = found.diceGameObject.transform.Find("ImagesContainer").gameObject;
+            ApplyPropsToImage(imageContainer, activatableDice);
+        }
+    }
+
 }

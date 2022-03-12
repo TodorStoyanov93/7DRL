@@ -11,7 +11,12 @@ public class AttackInRangeSide : SideData
 
     public override void OnUse(Vector2Int target)
     {
-        ActionExecutor.Instance.DealDamageInTile(target, power);
+
+        ActionExecutor.Instance.StartCoroutine(OnSideUse(target,power));
+    }
+
+    IEnumerator OnSideUse(Vector2Int target,int power) {
+        yield return ActionExecutor.Instance.DealDamageInTile(target, power);
     }
 
     public override List<Vector2Int> GetValidTargets(Vector2Int casterPosition) {

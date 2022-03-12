@@ -5,28 +5,26 @@ using UnityEngine.UI;
 
 public class RogueGameManager : MonoBehaviour
 {
-
+    public static RogueGameManager Instance;
     GameObject mainMenu;
-    BoardManager boardManager;
-
+    GameObject endGameScreen;
+    GameObject canvas;
     private void Awake()
     {
-        mainMenu = GameObject.Find("StartMenu");
-        GameObject startGameButton = GameObject.Find("StartGameButton");
-        if (startGameButton!= null)
-        {
-            startGameButton.GetComponent<Button>().onClick.AddListener(StartGameClicked);
-        }
-        boardManager = GetComponent<BoardManager>();
+        Instance = this;
+        canvas = GameObject.Find("Canvas");
+        mainMenu = canvas.transform.Find("StartMenu").gameObject;
+        endGameScreen = canvas.transform.Find("EndScreenContainer").gameObject;
     }
 
     void Start()
     {
         PlayerUIManager.Instance.DisablePlayerUi();
-        GameObject startGameButton = GameObject.Find("StartGameButton");
-        if (startGameButton == null)
-        {
-            boardManager.StartGame();
+        if (!mainMenu.activeInHierarchy) {
+            BoardManager.Instance.ResetCounters();
+
+            BoardManager.Instance.CreatePlayer();
+            BoardManager.Instance.StartNewLevel();
         }
     }
 
@@ -36,9 +34,37 @@ public class RogueGameManager : MonoBehaviour
         
     }
 
+    public void ShowEndScreen(int roomsCleared,int enemiesKilled,int turns) {
+        endGameScreen.SetActive(true);
+        var infoContainer = endGameScreen.transform.Find("InfoContainer");
+
+        var enemiesCounter = infoContainer.Find("Enemies-killed-counter").gameObject;
+        SetText(enemiesCounter, enemiesKilled);
+
+        var turnsCounter = infoContainer.Find("Turns-spent-counter").gameObject;
+        SetText(turnsCounter, turns);
+
+        var roomsCounter = infoContainer.Find("Rooms-cleared-counter").gameObject;
+        SetText(roomsCounter, roomsCleared);
+
+    }
+
+    private void SetText(GameObject textGameObject, int text) {
+        textGameObject.GetComponent<Text>().text = text.ToString();
+    }
+
 
     public void StartGameClicked() {
         mainMenu.SetActive(false);
-        boardManager.StartGame();
+        BoardManager.Instance.ResetCounters();
+
+        BoardManager.Instance.CreatePlayer();
+        BoardManager.Instance.StartNewLevel();
+    }
+
+    public void RestartGameClicked()
+    {
+        mainMenu.SetActive(true);
+        endGameScreen.SetActive(false);
     }
 }

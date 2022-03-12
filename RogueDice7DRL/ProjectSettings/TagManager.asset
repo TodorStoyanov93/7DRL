@@ -53,6 +53,9 @@ TagManager:
   - name: Overlay
     uniqueID: 180701343
     locked: 0
+  - name: HealthBar
+    uniqueID: 2025319703
+    locked: 0
   - name: Cards
     uniqueID: 1283335887
     locked: 0

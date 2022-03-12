@@ -685,6 +685,7 @@ MonoBehaviour:
   enemyPrefabs:
   - {fileID: 3187044391041101398, guid: afac4775152dae943911949525f5e3a3, type: 3}
   levelReached: 1
+  healthBarPrefab: {fileID: 3388886228355412176, guid: 7ba7c7df384279c4ebd865b028af5e6a, type: 3}
 --- !u!114 &355660178
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6908,7 +6909,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &978944730
 RectTransform:
   m_ObjectHideFlags: 0

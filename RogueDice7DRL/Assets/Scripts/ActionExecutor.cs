@@ -23,7 +23,7 @@ public class ActionExecutor : MonoBehaviour
 
     IEnumerator ApplyShieldInTileCoroutine(Vector2Int position, int shield  )
     {
-        var tileAnimationCoroutine = StartCoroutine(AnimationManager.Instance.PlayBlastAnimationCoroutine(position));
+        var tileAnimationCoroutine = StartCoroutine(AnimationManager.Instance.PlayShieldAnimationCoroutine(position));
 
         var enemyHit = BoardManager.Instance.enemyUnits.Find(enemy => enemy.GetVector2IntPosition() == position);
         if (enemyHit != null)

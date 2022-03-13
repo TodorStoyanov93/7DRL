@@ -38,6 +38,9 @@ public class BlastSide : SideData
         for (var x = -range; x <= range; x++) {
             for (var y = -range; y <= range; y++)
             {
+                if (x == 0 && y == 0) {
+                    continue;
+                }
                 var tilePos = casterPosition + new Vector2Int(x,y);
                 tilePositionsToCheck.Add(tilePos);
             }

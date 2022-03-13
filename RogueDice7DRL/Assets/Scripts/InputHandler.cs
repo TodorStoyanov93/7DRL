@@ -80,8 +80,8 @@ public class InputHandler : MonoBehaviour
             }
 
         }
-        else if (playerInputState == PlayerInputState.Undefined) { 
-        
+        else if (playerInputState == PlayerInputState.Undefined) {
+
         }
     }
 
@@ -163,7 +163,7 @@ public class InputHandler : MonoBehaviour
         }
         else if (playerInputState == PlayerInputState.Undefined)
         {
-
+            PlayerUIManager.Instance.CancelCurrentDice();
         }
     }
 

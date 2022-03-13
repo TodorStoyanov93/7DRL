@@ -9,21 +9,39 @@ public class AIControlledUnit : Unit
         var playerPos = BoardManager.Instance.playerUnit.GetVector2IntPosition();
         var distance = (playerPos - this.GetVector2IntPosition()).magnitude;
 
-        if (distance < 3)
+        if (distance < 1.5f)
         {
             var c = DealDamageCoroutine();
             ActionExecutor.Instance.StartCoroutine(c);
         }
         else { 
         
-            var randomDirection = new List<Vector2Int>()
+
+            var playerDiff = this.GetVector2IntPosition() - BoardManager.Instance.playerUnit.GetVector2IntPosition();
+
+            Debug.Log(playerDiff);
+            Vector2Int targetPosition = Vector2Int.zero;
+            if (Mathf.Abs(playerDiff.x) > Mathf.Abs(playerDiff.y))
             {
-                new Vector2Int(0,-Random.Range(1,3)),
-                new Vector2Int(0,Random.Range(1,3)),
-                new Vector2Int(-Random.Range(1,3),0),
-                new Vector2Int(-Random.Range(1,3),0)
-            }[Random.Range(0,4)];
-            Vector2Int targetPosition = Helpers.RoundToVector2Int(this.gameObject.transform.position) + randomDirection;
+                if (playerDiff.x > 0)
+                {
+                    targetPosition = this.GetVector2IntPosition() + new Vector2Int(-1, 0);
+                }
+                else
+                {
+                    targetPosition = this.GetVector2IntPosition() + new Vector2Int(1, 0);
+                }
+            }
+            else {
+                if (playerDiff.y > 0)
+                {
+                    targetPosition = this.GetVector2IntPosition() + new Vector2Int(0,-1);
+                }
+                else
+                {
+                    targetPosition = this.GetVector2IntPosition() + new Vector2Int(0, 1);
+                }
+            }
 
             var coroutine = MoveUnitCoroutine(this, targetPosition);
             ActionExecutor.Instance.StartCoroutine(coroutine);

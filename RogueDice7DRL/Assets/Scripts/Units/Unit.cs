@@ -35,7 +35,7 @@ public abstract class Unit
         if (gameObject != null && gameObject.transform.childCount > 0)
         {
             var healthText = this.gameObject.transform.GetChild(0).GetChild(1).GetChild(1);
-            healthText.GetComponent<TextMesh>().text = currentHealth.ToString() + "/" + currentHealth.ToString();
+            healthText.GetComponent<TextMesh>().text = currentHealth.ToString() + "/" + maxHealth.ToString();
 
         }
     }

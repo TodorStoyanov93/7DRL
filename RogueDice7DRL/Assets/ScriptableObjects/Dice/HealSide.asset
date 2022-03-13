@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 847030962be46c44881e56e157130c26, type: 3}
   m_Name: HealSide
   m_EditorClassIdentifier: 
-  description: Heal for 3
-  power: 3
+  description: Heal for 1
+  power: 1
   backgroundColor: {r: 0.27833602, g: 0.6981132, b: 0.24697402, a: 1}
-  foregroundImage: {fileID: 21300000, guid: 564c03a2f21ae834d9c28c406319ff32, type: 3}
+  foregroundImage: {fileID: 21300000, guid: fd47aec22384e384db78d1aa8dee7321, type: 3}
   range: 0

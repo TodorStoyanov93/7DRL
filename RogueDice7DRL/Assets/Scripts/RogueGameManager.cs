@@ -34,7 +34,7 @@ public class RogueGameManager : MonoBehaviour
         
     }
 
-    public void ShowEndScreen(int roomsCleared,int enemiesKilled,int turns) {
+    public void ShowEndScreen(int roomsCleared,int enemiesKilled,int turns,bool won) {
         endGameScreen.SetActive(true);
         var infoContainer = endGameScreen.transform.Find("InfoContainer");
 
@@ -46,7 +46,8 @@ public class RogueGameManager : MonoBehaviour
 
         var roomsCounter = infoContainer.Find("Rooms-cleared-counter").gameObject;
         SetText(roomsCounter, roomsCleared);
-
+        var wonText = endGameScreen.transform.Find("YouDiedOrWonText").GetComponent<Text>(); ;
+        wonText.text = won ? "You Won!" : "You Lost.";
     }
 
     private void SetText(GameObject textGameObject, int text) {

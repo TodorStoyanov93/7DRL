@@ -102,11 +102,12 @@ public class InputHandler : MonoBehaviour
     {
         if (playerInputState == PlayerInputState.Default)
         {
+            
 
         }
         else if (playerInputState == PlayerInputState.ChoseTarget)
         {
-
+            selectedDice = null;
             PlayerUIManager.Instance.CancelCurrentDice();
             PlayerUIManager.Instance.HideDiceTooltip();
             OverlayController.Instance.ClearTargetTiles();
@@ -167,11 +168,6 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-
-    public void EndTurnClicked() {
-
-    }
-
     public void RollClicked() {
         StartCoroutine(Roll());
     }
@@ -187,13 +183,11 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-
-
-    public void CheatClicked() { 
-        
-    }
-
     public void TurnBeginsForPlayer() {
+        if (playerInputState != PlayerInputState.Undefined || this.selectedDice != null) {
+            Debug.Log("Begin turn has state other than undefined or selected dice");
+            throw new Exception("Begin turn has state other than undefined or selected dice");
+        }
         if (playerInputState == PlayerInputState.Undefined) {
             if (selectedDice == null)
             {

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8d8128243ff26f4a989b8734d4019ac, type: 3}
   m_Name: AttackIn1RangeSide
   m_EditorClassIdentifier: 
-  description: Attack in 1 range side
+  description: Attack in 1 range
   power: 1
   backgroundColor: {r: 0.8679245, g: 0.25792095, b: 0.25792095, a: 1}
   foregroundImage: {fileID: 21300000, guid: 1ec042e549e0085418370ec7a37d3b0f, type: 3}

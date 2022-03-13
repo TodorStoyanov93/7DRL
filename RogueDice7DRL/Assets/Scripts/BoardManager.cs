@@ -133,7 +133,7 @@ public class BoardManager : MonoBehaviour
             playerUnit = null;
             ResetBoardManager();
             
-            EndGameScreen();
+            EndGameScreen(false);
         }
 
         if (unit == TurnSystem.Instance.currentUnit)
@@ -168,17 +168,17 @@ public class BoardManager : MonoBehaviour
         levelReached++;
         roomsCleared++;
         ResetBoardManager();
-        if (levelReached < 5) {
+        if (levelReached < 1) {
             AddSingleRandomDiceToPlayer();
             StartNewLevel();
         } else {
-            EndGameScreen();
+            EndGameScreen(true);
         }
     }
 
-    void EndGameScreen()
+    void EndGameScreen(bool won)
     {
-        RogueGameManager.Instance.ShowEndScreen(roomsCleared,enemiesKilled,playerTurns);
+        RogueGameManager.Instance.ShowEndScreen(roomsCleared,enemiesKilled,playerTurns,won);
     }
 
     public void ResetCounters() {

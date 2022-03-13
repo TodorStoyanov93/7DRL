@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3b3f89830de73e428b8621178ada98a, type: 3}
   m_Name: BlastSide 1
   m_EditorClassIdentifier: 
-  description: 
+  description: Blast for 2 in 4 range
   power: 2
   backgroundColor: {r: 0.4811321, g: 0.36263883, b: 0.097588114, a: 1}
   foregroundImage: {fileID: 21300000, guid: 6b987d3e8e06911419630c8c95acb053, type: 3}

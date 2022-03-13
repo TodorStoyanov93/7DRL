@@ -8,6 +8,7 @@ public class AnimationManager : MonoBehaviour
 
     public GameObject blastAnimationObject;
     public GameObject shieldAnimationObject;
+    public GameObject healAnimationObject;
 
     private void Awake()
     {
@@ -50,6 +51,12 @@ public class AnimationManager : MonoBehaviour
         Destroy(anim);
     }
 
+    public IEnumerator PlayHealthAnimationCoroutine(Vector2Int position)
+    {
+        var anim = Instantiate(healAnimationObject, new Vector3(position.x, position.y, 0), Quaternion.identity);
+        yield return new WaitForSeconds(0.3f);
+        Destroy(anim);
+    }
 
     public void PlayAttackAnimation(Unit unit) {
         var animator = unit.gameObject.GetComponent<Animator>();

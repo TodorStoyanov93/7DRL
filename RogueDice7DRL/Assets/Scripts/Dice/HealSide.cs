@@ -11,7 +11,12 @@ public class HealSide : SideData
 
     public override void OnUse(Vector2Int target)
     {
-        Debug.Log("Side use" + this);
+        ActionExecutor.Instance.StartCoroutine(OnDiceUse(target));
+    }
+
+    IEnumerator OnDiceUse(Vector2Int target)
+    {
+        yield return ActionExecutor.Instance.StartCoroutine(ActionExecutor.Instance.ApplyHealthInTile(target, power));
     }
 
     public override List<Vector2Int> GetValidTargets(Vector2Int casterPosition) {

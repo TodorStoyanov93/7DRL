@@ -13,13 +13,20 @@ public abstract class Unit
         {
 
             var frame = this.gameObject.transform.GetChild(0).GetChild(0);
-            var healthText = this.gameObject.transform.GetChild(0).GetChild(1).GetChild(1);
+            var healthText = this.gameObject.transform.GetChild(0).GetChild(1);
             healthText.GetComponent<Renderer>().sortingLayerID = frame.GetComponent<Renderer>().sortingLayerID;
             healthText.GetComponent<TextMesh>().text = currentHealth.ToString() + "/" + maxHealth.ToString();
+            var hpbarContainer = this.gameObject.transform.GetChild(0).GetChild(2);
 
-            var shieldText = this.gameObject.transform.GetChild(0).GetChild(2).GetChild(0);
+            if (currentHealth == 0) {
+                hpbarContainer.transform.localScale = new Vector3(0, 1, 1);
+            } else {
+                hpbarContainer.transform.localScale = new Vector3(1/(maxHealth/currentHealth),1,0);
+            }
+            var shieldText = this.gameObject.transform.GetChild(0).GetChild(3).GetChild(0);
             shieldText.GetComponent<Renderer>().sortingLayerID = frame.GetComponent<Renderer>().sortingLayerID;
             shieldText.GetComponent<Renderer>().sortingOrder = 5;
+
             if (shield > 0)
             {
                 shieldText.GetComponent<TextMesh>().text = shield.ToString();
@@ -34,9 +41,17 @@ public abstract class Unit
         currentHealth = health;
         if (gameObject != null && gameObject.transform.childCount > 0)
         {
-            var healthText = this.gameObject.transform.GetChild(0).GetChild(1).GetChild(1);
+            var healthText = this.gameObject.transform.GetChild(0).GetChild(1);
             healthText.GetComponent<TextMesh>().text = currentHealth.ToString() + "/" + maxHealth.ToString();
-
+            var hpbarContainer = this.gameObject.transform.GetChild(0).GetChild(2);
+            if (currentHealth == 0)
+            {
+                hpbarContainer.transform.localScale = new Vector3(0, 1, 1);
+            }
+            else
+            {
+                hpbarContainer.transform.localScale = new Vector3(1f / ((float)maxHealth / (float)currentHealth), 1, 0);
+            }
         }
     }
 
@@ -45,12 +60,12 @@ public abstract class Unit
         this.shield = shield;
         if (shield > 0)
         {
-            var shieldText = this.gameObject.transform.GetChild(0).GetChild(2).GetChild(0);
+            var shieldText = this.gameObject.transform.GetChild(0).GetChild(3).GetChild(0);
             shieldText.GetComponent<TextMesh>().text = shield.ToString();
             shieldText.parent.gameObject.SetActive(true);
         }
         else {
-            var shieldText = this.gameObject.transform.GetChild(0).GetChild(2).GetChild(0);
+            var shieldText = this.gameObject.transform.GetChild(0).GetChild(3).GetChild(0);
             shieldText.parent.gameObject.SetActive(false);
         }
     }

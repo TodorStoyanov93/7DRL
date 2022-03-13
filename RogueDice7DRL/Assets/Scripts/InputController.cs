@@ -38,7 +38,7 @@ public class InputController : MonoBehaviour
                 if (Input.GetMouseButtonDown(0)) //not if over ui element
                 {
                     if (isActive) { 
-                        InputHandler.Instance.OnTileClick(hitGoPos);
+                        InputHandler.Instance.OnTileClick(hitGoPos);    
                     }
                 }
                 if (isActive) {

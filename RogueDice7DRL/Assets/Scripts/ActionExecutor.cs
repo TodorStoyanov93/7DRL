@@ -50,6 +50,45 @@ public class ActionExecutor : MonoBehaviour
         yield break;
     }
 
+
+    public IEnumerator ApplyHealthInTile(Vector2Int position, int health)
+    {
+        yield return StartCoroutine(ApplyHealthInTileCoroutine(position, health));
+    }
+
+    IEnumerator ApplyHealthInTileCoroutine(Vector2Int position, int health)
+    {
+        var tileAnimationCoroutine = StartCoroutine(AnimationManager.Instance.PlayHealthAnimationCoroutine(position));
+
+        var enemyHit = BoardManager.Instance.enemyUnits.Find(enemy => enemy.GetVector2IntPosition() == position);
+        if (enemyHit != null)
+        {
+            yield return StartCoroutine(ApplyShield(enemyHit, health));
+        }
+        else
+        {
+            var playerIsHit = BoardManager.Instance.playerUnit.GetVector2IntPosition() == position;
+            if (playerIsHit)
+            {
+                yield return StartCoroutine(ApplyHealth(BoardManager.Instance.playerUnit, health));
+            }
+        }
+
+        yield return tileAnimationCoroutine;
+    }
+
+
+
+
+
+    IEnumerator ApplyHealth(Unit unit, int health)
+    {
+        unit.SetHealth(Mathf.Min(unit.maxHealth, health + unit.currentHealth));
+
+        yield break;
+    }
+
+
     public IEnumerator DealDamageInTile(Vector2Int position, int damage)
     {
         yield return StartCoroutine(DealDamageInTileCoroutine(position,damage));

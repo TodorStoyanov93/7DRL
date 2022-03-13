@@ -168,7 +168,7 @@ public class BoardManager : MonoBehaviour
         levelReached++;
         roomsCleared++;
         ResetBoardManager();
-        if (levelReached < 1) {
+        if (levelReached < 5) {
             AddSingleRandomDiceToPlayer();
             StartNewLevel();
         } else {

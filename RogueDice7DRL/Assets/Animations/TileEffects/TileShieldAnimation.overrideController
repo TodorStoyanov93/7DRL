@@ -9,5 +9,5 @@ AnimatorOverrideController:
   m_Name: TileShieldAnimation
   m_Controller: {fileID: 9100000, guid: 7613d27149da81b4fbeea1cc37b52ffd, type: 2}
   m_Clips:
-  - m_OriginalClip: {fileID: 7400000, guid: c72bf0280e3b2d34d86e0d2940c371c8, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 5d005a7236e18834e90d7b904a45c9d7, type: 2}
     m_OverrideClip: {fileID: 7400000, guid: c72bf0280e3b2d34d86e0d2940c371c8, type: 2}
